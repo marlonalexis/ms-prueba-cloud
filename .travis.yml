@@ -9,9 +9,16 @@ os: linux
 ## Install java
 ##jdk: oraclejdk8
 
+addons:
+  sonarcloud:
+    organization: "sonarcloud"
+    token:
+      secure: "6df84e73008e69398ef5561595c91898bd931547"
+
 ## Scripts
 script:
   - mvn clean install
+  - mvn clean verify sonar:sonar -Pcoverage
 
 cache:
   directories:
