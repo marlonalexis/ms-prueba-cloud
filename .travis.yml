@@ -1,9 +1,16 @@
+## Lenguaje de la app
 language: java
+## Sistema operativo
+os: linux
+
+## Install java
 jdk: oraclejdk8
 
-install: false
-script: mvn clean install
+## Scripts
+script:
+  - mvn clean
+  - mvn install
 
 cache:
   directories:
-    - $HOME/bin
+    - $HOME/.m2
