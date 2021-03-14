@@ -17,7 +17,7 @@ addons:
 ## Scripts
 script:
   - mvn clean install
-  - mvn clean verify sonar:sonar -Pcoverage
+  - mvn clean verify sonar:sonar
 
 cache:
   directories:
