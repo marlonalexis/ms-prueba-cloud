@@ -17,7 +17,7 @@ addons:
 ## Scripts
 script:
   - mvn clean install
-  - mvn clean verify sonar:sonar
+  - mvn clean verify -Pjacoco coveralls:report sonar:sonar -Pcoverage -Dsonar.projectKey=mpluasgu_ms-prueba-cloud
 
 cache:
   directories:
