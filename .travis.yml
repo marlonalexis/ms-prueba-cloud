@@ -4,11 +4,12 @@ install: true
 ## Lenguaje de la app
 language: java
 ## Sistema operativo
-os: linux
+##os: linux
 
 ## Install java
 ##jdk: oraclejdk8
 
+## Agregar plugin sonar
 addons:
   sonarcloud:
     organization: "mpluasgu"
@@ -16,8 +17,7 @@ addons:
 
 ## Scripts
 script:
-  - mvn clean install
-  - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=mpluasgu_ms-prueba-cloud
+  - mvn clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=${SONAR_KEY_PROJECT}
 
 cache:
   directories:
