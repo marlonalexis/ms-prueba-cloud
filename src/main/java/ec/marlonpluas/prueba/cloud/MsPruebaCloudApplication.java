@@ -11,7 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
@@ -30,7 +30,7 @@ public class MsPruebaCloudApplication implements CommandLineRunner {
     private String passAdmin;
 
     @Autowired
-    private BCryptPasswordEncoder encodePass;
+    private PasswordEncoder bcryptEncoder;
 
     @Autowired
     private InfoUsuarioRepository infoUsuarioRepo;
@@ -46,7 +46,7 @@ public class MsPruebaCloudApplication implements CommandLineRunner {
             log.info("Creando usuario administrador {}", userAdmin);
             InfoUsuario admin = new InfoUsuario();
             admin.setUsername(userAdmin);
-            admin.setPassword(encodePass.encode(passAdmin));
+            admin.setPassword(bcryptEncoder.encode(passAdmin));
             admin.setCorreo(correoAdmin);
             admin.setEstado(Estado.Activo.toString());
             admin.setFeCreacion(new Date());
