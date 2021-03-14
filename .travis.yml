@@ -1,3 +1,6 @@
+sudo: false
+install: true
+
 ## Lenguaje de la app
 language: java
 ## Sistema operativo
@@ -8,9 +11,8 @@ jdk: oraclejdk9
 
 ## Scripts
 script:
-  - mvn clean
-  - mvn install
+  - mvn clean install
 
 cache:
   directories:
-    - $HOME/.m2
+    - $HOME/.m2/repository
