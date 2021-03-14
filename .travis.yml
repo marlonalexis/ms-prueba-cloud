@@ -12,8 +12,7 @@ os: linux
 addons:
   sonarcloud:
     organization: "mpluasgu"
-    token:
-      secure: "6df84e73008e69398ef5561595c91898bd931547"
+    token: ${SONAR_TOKEN}
 
 ## Scripts
 script:
