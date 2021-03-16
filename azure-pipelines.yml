@@ -49,6 +49,7 @@ stages:
 
   - stage: Deploy_Test
     displayName: Stage Deploy Test
+    dependsOn: Copy
     condition: and(succeeded(), eq(variables.branch, 'main'))
     jobs:
       - job: Deploy
@@ -65,7 +66,8 @@ stages:
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
-    condition: and(failed(), eq(variables.branch, 'main'))
+    dependsOn: Copy
+    condition: eq(dependencies.Deploy_Test.result,'SucceededWithIssues')
     jobs:
       - job: Deploy
         displayName: Deploy job
