@@ -36,7 +36,7 @@ stages:
       displayName: 'Securely copy files to the remote machine'
       inputs:
         sshEndpoint: marlonpluasvm1
-        sourceFolder: '$(System.DefaultWorkingDirectory)/_marlonalexis_ms-prueba-cloud'
+        #sourceFolder: '$(System.DefaultWorkingDirectory)/_marlonalexis_ms-prueba-cloud'
         targetFolder: deploy
 
 
