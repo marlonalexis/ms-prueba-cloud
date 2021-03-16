@@ -9,7 +9,6 @@ variables:
   MAVEN_CACHE_FOLDER: $(HOME)/.m2/repository
   branch: variables['Build.SourceBranch']
 
-stages:
 - task: Cache@2
   inputs:
     key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
@@ -17,6 +16,7 @@ stages:
     path: $(MAVEN_CACHE_FOLDER)
   displayName: Cache Maven local repo
 
+stages:
 - stage: Stage Maven
   displayName: Stage Maven
   jobs:
