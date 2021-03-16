@@ -9,6 +9,7 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+stages:
 - stage: Maven
   displayName: Maven stage
   jobs:
