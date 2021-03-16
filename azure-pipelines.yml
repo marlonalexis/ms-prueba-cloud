@@ -8,7 +8,8 @@ pool:
 variables:
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.Repository.Name)
-  serviceDeploy: nginx
+  serviceDeploy1: nginx
+  serviceDeploy: nginx_nginx
 
 stages:
   - stage: Maven
@@ -23,6 +24,13 @@ stages:
               restoreKeys: |
               path: $(mavenCacheFolder)
             displayName: Cache Maven local repo
+
+          - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+            displayName: 'Prepare analysis on SonarCloud'
+            inputs:
+              SonarCloud: 'mpluasgu_ms-prueba-cloud'
+              organization: 'mpluasgu_ms-prueba-cloud'
+              scannerMode: Other
 
           - task: Maven@3
             inputs:
@@ -61,8 +69,8 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                docker service rm ${serviceDeploy}
-                docker stack deploy -c docker-compose.yml ${serviceDeploy}
+                docker service rm $(serviceDeploy)
+                docker stack deploy -c docker-compose.yml $(serviceDeploy1)
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
@@ -77,6 +85,6 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                docker service rm ${serviceDeploy}
-                docker stack deploy -c docker-compose.yml ${serviceDeploy}
+                docker service rm $(serviceDeploy)
+                docker stack deploy -c docker-compose.yml $(serviceDeploy1)
 
