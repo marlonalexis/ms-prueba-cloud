@@ -1,6 +1,6 @@
 trigger:
-- main
-- feature/*
+  - main
+  - feature/*
 
 pool:
   vmImage: ubuntu-latest
@@ -8,43 +8,74 @@ pool:
 variables:
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.Repository.Name)
+  service_deploy: nginx
 
 stages:
-- stage: Maven
-  displayName: Stage Maven
-  jobs:
-  - job: Maven
-    displayName: Maven job
-    steps:
-    - task: Cache@2
-      inputs:
-        key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
-        restoreKeys: |
-        path: $(mavenCacheFolder)
-      displayName: Cache Maven local repo
+  - stage: Maven
+    displayName: Stage Maven
+    jobs:
+      - job: Maven
+        displayName: Maven job
+        steps:
+          - task: Cache@2
+            inputs:
+              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+              path: $(mavenCacheFolder)
+            displayName: Cache Maven local repo
 
-    - task: Maven@3
-      inputs:
-        mavenPomFile: 'pom.xml'
-        mavenOptions: '-Xmx3072m'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.8'
-        jdkArchitectureOption: 'x64'
-        publishJUnitResults: true
-        testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        goals: 'package'
+          - task: Maven@3
+            inputs:
+              mavenPomFile: 'pom.xml'
+              mavenOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.8'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/surefire-reports/TEST-*.xml'
+              goals: 'package'
 
-- stage: Copy
-  displayName: Stage Copy
-  condition: and(succeeded(), eq(variables.branch, 'test'))
-  jobs:
-  - job: Copy
-    displayName: Copy job
-    steps:
-    - task: CopyFilesOverSSH@0
-      displayName: 'Securely copy files to the remote machine'
-      inputs:
-        sshEndpoint: marlonpluasvm1
-        targetFolder: deploy
+  - stage: Copy
+    displayName: Stage Copy
+    jobs:
+      - job: Copy
+        displayName: Copy job
+        steps:
+          - task: CopyFilesOverSSH@0
+            displayName: 'Securely copy files to the remote machine'
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              targetFolder: deploy
 
+  - stage: Deploy_Test
+    displayName: Stage Deploy Test
+    condition: and(succeeded(), eq(variables.branch, 'main'))
+    jobs:
+      - job: Deploy
+        displayName: Deploy job
+        steps:
+          - task: SSH@0
+            displayName: 'Run shell commands on remote machine'
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                cd deploy
+                docker service rm ${service_deploy}
+                docker stack deploy -c docker-compose.yml ${service_deploy}
+
+  - stage: Deploy_Prod
+    displayName: Stage Deploy Prod
+    condition: and(failed(), eq(variables.branch, 'main'))
+    jobs:
+      - job: Deploy
+        displayName: Deploy job
+        steps:
+          - task: SSH@0
+            displayName: 'Run shell commands on remote machine'
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                cd deploy
+                docker service rm ${service_deploy}
+                docker stack deploy -c docker-compose.yml ${service_deploy}
 
