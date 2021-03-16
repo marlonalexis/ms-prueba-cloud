@@ -8,7 +8,7 @@ pool:
 variables:
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.Repository.Name)
-  service_deploy: nginx
+  serviceDeploy: nginx
 
 stages:
   - stage: Maven
@@ -61,8 +61,8 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                docker service rm ${service_deploy}
-                docker stack deploy -c docker-compose.yml ${service_deploy}
+                docker service rm ${serviceDeploy}
+                docker stack deploy -c docker-compose.yml ${serviceDeploy}
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
@@ -77,6 +77,6 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                docker service rm ${service_deploy}
-                docker stack deploy -c docker-compose.yml ${service_deploy}
+                docker service rm ${serviceDeploy}
+                docker stack deploy -c docker-compose.yml ${serviceDeploy}
 
