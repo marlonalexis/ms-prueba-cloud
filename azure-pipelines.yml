@@ -41,7 +41,7 @@ stages:
               jdkArchitectureOption: 'x64'
               publishJUnitResults: true
               testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'package'
+              goals: 'clean verify sonar:sonar'
 
   - stage: Copy
     displayName: Stage Copy
