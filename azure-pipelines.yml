@@ -15,8 +15,6 @@ stages:
   jobs:
   - job: Maven
     displayName: Maven job
-    pool:
-      vmImage: $(vmImageName)
     steps:
     - task: Maven@3
       inputs:
