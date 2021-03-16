@@ -25,7 +25,7 @@ stages:
               path: $(mavenCacheFolder)
             displayName: Cache Maven local repo
 
-          - task: SonarSource.sonarcloud.14d9cde6-c1da-4d55-aa01-2965cd301255.SonarCloudPrepare@1
+          - task: SonarCloudPrepare@1
             displayName: 'Prepare analysis on SonarCloud'
             inputs:
               SonarCloud: 'mpluasgu_ms-prueba-cloud'
@@ -33,15 +33,28 @@ stages:
               scannerMode: Other
 
           - task: Maven@3
+            displayName: 'Execute Maven goal'
             inputs:
               mavenPomFile: 'pom.xml'
+              options: '-Dmaven.test.failure.ignore=true'
               mavenOptions: '-Xmx3072m'
+              mavenVersionOption: 'Default'
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.8'
               jdkArchitectureOption: 'x64'
               publishJUnitResults: true
-              testResultsFiles: '**/surefire-reports/TEST-*.xml'
-              goals: 'clean verify sonar:sonar'
+              mavenAuthenticateFeed: false
+              effectivePomSkip: false
+              sonarQubeRunAnalysis: true
+              sqMavenPluginVersionChoice: 'latest'
+              codeCoverageToolOption: 'JaCoCo'
+              testResultsFiles: '**/TEST-*.xml'
+              goals: 'verify'
+
+          - task: SonarCloudPublish@1
+            displayName: 'Publish results on build summary'
+            inputs:
+              pollingTimeoutSec: '300'
 
   - stage: Copy
     displayName: Stage Copy
