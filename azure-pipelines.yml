@@ -9,6 +9,7 @@ variables:
   MAVEN_CACHE_FOLDER: $(HOME)/.m2/repository
   branch: variables['Build.SourceBranch']
 
+steps:
 - task: Cache@2
   inputs:
     key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
