@@ -3,6 +3,8 @@ version: "3.1"
 services:
   nginx:
     image: nginx:stable-alpine
+    container_name: nginx
+    restart: always
     ports:
       - "80:80"
       - "443:443"
