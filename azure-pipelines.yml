@@ -10,7 +10,7 @@ variables:
   branch: variables['Build.SourceBranch']
 
 stages:
-- stage: Stage Maven
+- stage: Maven
   displayName: Stage Maven
   jobs:
   - job: Maven
@@ -34,7 +34,7 @@ stages:
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
         goals: 'package'
 
-- stage: Stage Copy
+- stage: Copy
   displayName: Stage Copy
   condition: and(succeeded(), eq(variables.branch, 'test'))
   jobs:
