@@ -7,7 +7,7 @@ pool:
 
 variables:
   mavenCacheFolder: $(HOME)/.m2/repository
-  branch: variables['Build.SourceBranch']
+  branch: $(Build.Repository.Name)
 
 stages:
 - stage: Maven
