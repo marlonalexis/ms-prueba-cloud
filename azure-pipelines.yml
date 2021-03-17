@@ -134,7 +134,7 @@ stages:
                 tags: 'latest'
               ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
                 tags: $(version)
-              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version) --cache-from=$(artifactId)'
+              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version) --cache-from=$(hostDockerRegistry)/$(artifactId)'
           - task: Docker@2
             displayName: Push docker image $(nombreImagen)
             inputs:
