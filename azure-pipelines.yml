@@ -51,7 +51,7 @@ stages:
           - task: Maven@3
             displayName: Unit tests
             inputs:
-              goals: verify install
+              goals: clean verify
               options: '-Dsonar.projectKey=$(sonarKeyProject)'
               testResultsFiles: '**/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
@@ -160,10 +160,18 @@ stages:
         displayName: Deploy job
         steps:
           - task: SSH@0
-            displayName: 'Run shell commands on remote machine'
+            displayName: Validate and remove swarm service
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
                 docker service rm $(serviceDeploy)
+              failOnStdErr: false
+            continueOnError: true
+          - task: SSH@0
+            displayName: Deploy swarm service
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                cd deploy
                 env NOMBRE_IMAGEN=$(nombreImagen) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
