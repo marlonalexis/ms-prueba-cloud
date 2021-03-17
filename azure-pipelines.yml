@@ -74,7 +74,7 @@ stages:
               containerRegistry: marlonpluasregistry
               command: login
           - script: "docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)"
-            displayName: Pull latest for layer caching
+            displayName: Pull image for caching
             continueOnError: true # for first build, no cache
           - task: Docker@2
             displayName: Build docker image
