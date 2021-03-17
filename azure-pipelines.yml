@@ -9,68 +9,9 @@ variables:
   - template: variables-pipelines.yml
 
 stages:
-  - stage: Development
-    displayName: Stage Development
-    jobs:
-      - job: Maven
-        displayName: Maven job
-        steps:
-          - task: Cache@2
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
-          - task: Maven@3
-            displayName: Validate maven structure
-            inputs:
-              goals: validate
-              options: '-Dmaven.test.skip=true'
-              publishJUnitResults: false
-      - job: Test
-        displayName: Test job
-        dependsOn: Maven
-        steps:
-          - task: SonarCloudPrepare@1
-            displayName: Prepare analysis in SonarCloud
-            inputs:
-              SonarCloud: 'mpluasgu_ms-prueba-cloud'
-              organization: 'mpluasgu'
-              scannerMode: Other
-          - task: Cache@2
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
-          - task: Maven@3
-            displayName: Unit tests
-            inputs:
-              goals: test
-              options: '-Dsonar.projectKey=$(sonarKeyProject)'
-              testResultsFiles: '**/TEST-*.xml'
-              codeCoverageToolOption: JaCoCo
-              codeCoverageRestoreOriginalPomXml: true
-              sonarQubeRunAnalysis: true
-              isJacocoCoverageReportXML: true
-          - task: SonarCloudPublish@1
-            displayName: Publish the results to the build summary
-            inputs:
-              pollingTimeoutSec: '300'
-          - task: PublishCodeCoverageResults@1
-            displayName: Publish code coverage
-            inputs:
-              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/jacoco.xml'
-              reportDirectory: '$(System.DefaultWorkingDirectory)/**/site/jacoco'
-              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/**/*.exec'
-
   - stage: Build
     displayName: Stage Build
-    dependsOn: Development
+    #dependsOn: Development
     jobs:
       - job: Download
         displayName: Download Repository job
@@ -98,9 +39,20 @@ stages:
               $packaging=$pomXml.project.packaging
               Write-Host "##vso[task.setvariable variable=packaging]$packaging"
               # nombreImagen
-              $nombreImagen=$artifactId+":"+$version
+              $nombreImagen=$artifactId
               Write-Host $nombreImagen
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+              # tagImagen
+              if eq(variables['Build.SourceBranchName'], 'main')
+              {
+                $tagImagen="latest"
+              }
+              else
+              {
+                $tagImagen=$version
+              }
+              Write-Host $tagImagen
+              Write-Host "##vso[task.setvariable variable=tagImagen]$tagImagen"
             displayName: Initializing variables
           - task: Cache@2
             inputs:
@@ -121,30 +73,24 @@ stages:
             inputs:
               containerRegistry: marlonpluasregistry
               command: login
-          - script: "docker pull $(hostDockerRegistry)/$(artifactId)"
+          - script: "docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)"
             displayName: Pull latest for layer caching
             continueOnError: true # for first build, no cache
           - task: Docker@2
-            displayName: Build docker image $(nombreImagen)
+            displayName: Build docker image
             inputs:
               containerRegistry: marlonpluasregistry
-              repository: $(artifactId)
+              repository: $(nombreImagen)
               command: build
-              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-                tags: 'latest'
-              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
-                tags: $(version)
-              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version) --cache-from=$(hostDockerRegistry)/$(artifactId)'
+              tags: $(tagImagen)
+              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version) --cache-from=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen)'
           - task: Docker@2
-            displayName: Push docker image $(nombreImagen)
+            displayName: Push docker image
             inputs:
               containerRegistry: marlonpluasregistry
-              repository: $(artifactId)
+              repository: $(nombreImagen)
               command: push
-              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-                tags: 'latest'
-              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
-                tags: $(version)
+              tags: $(tagImagen)
 
   - stage: Deploy_Test
     displayName: Stage Deploy Test
@@ -183,7 +129,7 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                docker pull $(hostDockerRegistry)/$(artifactId):$(version)
+                docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
               failOnStdErr: false
             continueOnError: true
           - task: SSH@0
@@ -192,4 +138,4 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(artifactId):$(version) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
+                env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)

@@ -11,3 +11,4 @@ variables:
   version: ''
   packaging: ''
   nombreImagen: ''
+  tagImagen: ''
