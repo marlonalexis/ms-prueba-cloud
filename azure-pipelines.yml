@@ -21,7 +21,7 @@ stages:
               restoreKeys: |
                 maven | "$(Agent.OS)"
                 maven
-              path: $(MAVEN_CACHE_FOLDER)
+              path: $(mavenCacheFolder)
             displayName: Cache Maven local repo
           - task: Maven@3
             displayName: Validate maven structure
