@@ -113,7 +113,7 @@ stages:
           - task: Maven@3
             displayName: Generate dependencies
             inputs:
-              goals: install
+              goals: package
               options: '-Dmaven.test.skip=true'
               publishJUnitResults: false
           - task: Docker@2
