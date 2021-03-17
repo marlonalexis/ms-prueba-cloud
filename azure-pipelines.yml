@@ -43,8 +43,6 @@ stages:
               Write-Host $nombreImagen
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
               # tagImagen
-              Write-Host $(Build.SourceBranchName)
-              Write-Host $(branch)
               if ('$(Build.SourceBranchName)' -eq 'main')
               {
                 $tagImagen="latest"
@@ -118,6 +116,36 @@ stages:
       - job: Deploy
         displayName: Deploy job
         steps:
+          - powershell: |
+              [xml]$pomXml = Get-Content .\pom.xml
+              # artifactId
+              Write-Host $pomXml.project.artifactId
+              $artifactId=$pomXml.project.artifactId
+              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
+              # version
+              Write-Host $pomXml.project.version
+              $version=$pomXml.project.version
+              Write-Host "##vso[task.setvariable variable=version]$version"
+              # packaging
+              Write-Host $pomXml.project.packaging
+              $packaging=$pomXml.project.packaging
+              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
+              # nombreImagen
+              $nombreImagen=$artifactId
+              Write-Host $nombreImagen
+              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+              # tagImagen
+              if ('$(Build.SourceBranchName)' -eq 'main')
+              {
+                $tagImagen="latest"
+              }
+              else
+              {
+                $tagImagen=$version
+              }
+              Write-Host $tagImagen
+              Write-Host "##vso[task.setvariable variable=tagImagen]$tagImagen"
+            displayName: Initializing variables
           - task: SSH@0
             displayName: Validate and remove swarm service
             inputs:
@@ -133,7 +161,6 @@ stages:
               commands: |
                 docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
               failOnStdErr: false
-            continueOnError: true
           - task: SSH@0
             displayName: Deploy swarm service
             inputs:
