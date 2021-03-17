@@ -8,26 +8,6 @@ pool:
 variables:
   - template: variables-pipelines.yml
 
-steps:
-  - powershell: |
-      [xml]$pomXml = Get-Content .\pom.xml
-      # artifactId
-      Write-Host $pomXml.project.artifactId
-      $artifactId=$pomXml.project.artifactId
-      Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
-      # version
-      Write-Host $pomXml.project.version
-      $version=$pomXml.project.version
-      Write-Host "##vso[task.setvariable variable=version]$version"
-      # packaging
-      Write-Host $pomXml.project.packaging
-      $packaging=$pomXml.project.packaging
-      Write-Host "##vso[task.setvariable variable=packaging]$packaging"
-      # nombreImagen
-      $nombreImagen=$artifactId+":"+$version
-      Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
-    displayName: 'Inicializando variables'
-
 stages:
   - stage: Maven
     displayName: Stage Maven
@@ -86,6 +66,24 @@ stages:
       - job: Build
         displayName: Build job
         steps:
+          - powershell: |
+              [xml]$pomXml = Get-Content .\pom.xml
+              # artifactId
+              Write-Host $pomXml.project.artifactId
+              $artifactId=$pomXml.project.artifactId
+              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
+              # version
+              Write-Host $pomXml.project.version
+              $version=$pomXml.project.version
+              Write-Host "##vso[task.setvariable variable=version]$version"
+              # packaging
+              Write-Host $pomXml.project.packaging
+              $packaging=$pomXml.project.packaging
+              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
+              # nombreImagen
+              $nombreImagen=$artifactId+":"+$version
+              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+            displayName: 'Inicializando variables'
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'

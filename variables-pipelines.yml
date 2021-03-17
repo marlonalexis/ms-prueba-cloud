@@ -4,3 +4,7 @@ variables:
   keySwarmDeploy: nginx
   serviceDeploy: nginx_$(keySwarmDeploy)
   sonarKeyProject: mpluasgu_ms-prueba-cloud
+  artifactId: ''
+  version: ''
+  packaging: ''
+  nombreImagen: ''
