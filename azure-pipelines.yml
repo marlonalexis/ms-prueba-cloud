@@ -22,7 +22,7 @@ stages:
                 maven | "$(Agent.OS)"
                 maven
               path: $(mavenCacheFolder)
-            displayName: Cache Maven local repo
+            displayName: Cache maven
           - task: Maven@3
             displayName: Validate maven structure
             inputs:
@@ -40,6 +40,14 @@ stages:
               SonarCloud: 'mpluasgu_ms-prueba-cloud'
               organization: 'mpluasgu'
               scannerMode: Other
+          - task: Cache@2
+            inputs:
+              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(mavenCacheFolder)
+            displayName: Cache maven
           - task: Maven@3
             displayName: Unit tests
             inputs:
@@ -61,6 +69,7 @@ stages:
             inputs:
               summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/jacoco.xml'
               reportDirectory: '$(System.DefaultWorkingDirectory)/**/site/jacoco'
+              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/**/*.exec'
 
   - stage: Build
     displayName: Stage Build
