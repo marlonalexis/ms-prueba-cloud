@@ -71,9 +71,9 @@ stages:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: build
-              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+              ${{ if eq($(branch), 'main') }}:
                 tags: 'latest'
-              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+              ${{ if ne($(branch), 'main') }}:
                 tags: $(version)
               arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
           - task: Docker@2
@@ -82,9 +82,9 @@ stages:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: push
-              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+              ${{ if eq($(branch), 'main') }}:
                 tags: 'latest'
-              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+              ${{ if ne($(branch), 'main') }}:
                 tags: $(version)
 
   - stage: Deploy_Test
