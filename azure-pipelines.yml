@@ -39,7 +39,7 @@ stages:
               $packaging=$pomXml.project.packaging
               Write-Host "##vso[task.setvariable variable=packaging]$packaging"
               # nombreImagen
-              $nombreImagen=$artifactId:$version;
+              $nombreImagen=$artifactId+":"+$version;
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
             displayName: 'PowerShell Script'
           - task: Cache@2
