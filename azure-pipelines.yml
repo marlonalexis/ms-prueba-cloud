@@ -8,10 +8,9 @@ pool:
 variables:
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.Repository.Name)
-  serviceDeploy1: nginx
-  serviceDeploy: nginx_nginx
+  keySwarmDeploy: nginx
+  serviceDeploy: nginx_$(keySwarmDeploy)
   sonarKeyProject: mpluasgu_ms-prueba-cloud
-  version: ''
 
 stages:
   - stage: Maven
@@ -20,28 +19,6 @@ stages:
       - job: Maven
         displayName: Maven job
         steps:
-          - powershell: |
-              [xml]$pomXml = Get-Content .\pom.xml
-              # artifactId
-              Write-Host $pomXml.project.artifactId
-              $artifactId=$pomXml.project.artifactId
-              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
-              # version
-              Write-Host $pomXml.project.version
-              $version=$pomXml.project.version
-              Write-Host "##vso[task.setvariable variable=version]$version"
-              # version
-              Write-Host $pomXml.project.version
-              $version=$pomXml.project.version
-              Write-Host "##vso[task.setvariable variable=version]$version"
-              # packaging
-              Write-Host $pomXml.project.packaging
-              $packaging=$pomXml.project.packaging
-              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
-              # nombreImagen
-              $nombreImagen=$artifactId+":"+$version;
-              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
-            displayName: 'PowerShell Script'
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -93,6 +70,24 @@ stages:
       - job: Build
         displayName: Build job
         steps:
+          - powershell: |
+              [xml]$pomXml = Get-Content .\pom.xml
+              # artifactId
+              Write-Host $pomXml.project.artifactId
+              $artifactId=$pomXml.project.artifactId
+              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
+              # version
+              Write-Host $pomXml.project.version
+              $version=$pomXml.project.version
+              Write-Host "##vso[task.setvariable variable=version]$version"
+              # packaging
+              Write-Host $pomXml.project.packaging
+              $packaging=$pomXml.project.packaging
+              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
+              # nombreImagen
+              $nombreImagen=$artifactId+":"+$version
+              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+            displayName: 'Inicializando variables'
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -136,7 +131,7 @@ stages:
               commands: |
                 cd deploy
                 docker service rm $(serviceDeploy)
-                docker stack deploy -c docker-compose.yml $(serviceDeploy1)
+                docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
@@ -152,5 +147,5 @@ stages:
               commands: |
                 cd deploy
                 docker service rm $(serviceDeploy)
-                docker stack deploy -c NOMBRE_IMAGEN=$(nombreImagen) docker-compose.yml $(serviceDeploy1)
+                docker stack deploy -c NOMBRE_IMAGEN=$(nombreImagen) docker-compose.yml $(keySwarmDeploy)
 
