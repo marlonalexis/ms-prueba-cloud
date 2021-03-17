@@ -45,7 +45,7 @@ stages:
               # tagImagen
               Write-Host $(Build.SourceBranchName)
               Write-Host $(branch)
-              if (variables['Build.SourceBranchName'] == 'main')
+              if ($(Build.SourceBranchName) == 'main')
               {
                 $tagImagen="latest"
               }
@@ -97,7 +97,7 @@ stages:
   - stage: Deploy_Test
     displayName: Stage Deploy Test
     dependsOn: Build
-    condition: and(succeeded(), eq(variables.branch, 'main'))
+    condition: and(succeeded(), eq(variables.branch, 'main2'))
     jobs:
       - job: Deploy
         displayName: Deploy job

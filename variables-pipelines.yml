@@ -1,7 +1,7 @@
 variables:
   hostDockerRegistry: marlonpluasregistry.azurecr.io
   mavenCacheFolder: $(HOME)/.m2/repository
-  branch: $(Build.Repository.Name)
+  branch: $(Build.SourceBranchName)
   serviceSwarm: cloud
   keySwarmDeploy: sso
   keySwarmDeployTest: sso_test
