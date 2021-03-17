@@ -43,8 +43,6 @@ stages:
               Write-Host $nombreImagen
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
             displayName: Initializing variables
-          - ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
-              - version: latest
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -64,35 +62,30 @@ stages:
             inputs:
               containerRegistry: marlonpluasregistry
               command: login
-          - task: Cache@2
-            inputs:
-              key: 'docker | "$(Agent.OS)" | docker-compose.yml'
-              path: $(Pipeline.Workspace)/docker
-              cacheHitVar: DOCKER_CACHE_RESTORED
-            displayName: Caching Docker image
-          - script: |
-              docker load < $(Pipeline.Workspace)/docker/cache.tar
-            condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
-          - script: |
-              mkdir -p $(Pipeline.Workspace)/docker
-              docker pull $(artifactId):$(version)
-              docker save $(artifactId):$(version) > $(Pipeline.Workspace)/docker/cache.tar
-            condition: and(not(canceled()), or(failed(), ne(variables.DOCKER_CACHE_RESTORED, 'true')))
+          - script: "docker pull $(artifactId)"
+            displayName: Pull latest for layer caching
+            continueOnError: true # for first build, no cache
           - task: Docker@2
             displayName: Build docker image $(nombreImagen)
             inputs:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: build
-              tags: $(version)
-              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
+              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+                tags: 'latest'
+              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+                tags: $(version)
+              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version) --cache-from=$(artifactId)'
           - task: Docker@2
             displayName: Push docker image $(nombreImagen)
             inputs:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: push
-              tags: $(version)
+              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+                tags: 'latest'
+              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
+                tags: $(version)
 
   - stage: Deploy_Test
     displayName: Stage Deploy Test
