@@ -121,7 +121,7 @@ stages:
             inputs:
               containerRegistry: marlonpluasregistry
               command: login
-          - script: "docker pull $(artifactId)"
+          - script: "docker pull $(hostDockerRegistry)/$(artifactId)"
             displayName: Pull latest for layer caching
             continueOnError: true # for first build, no cache
           - task: Docker@2
