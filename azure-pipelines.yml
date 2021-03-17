@@ -50,7 +50,7 @@ stages:
           - task: Maven@3
             displayName: Unit tests
             inputs:
-              goals: install verify
+              goals: verify install
               options: '-Dsonar.projectKey=$(sonarKeyProject)'
               testResultsFiles: '**/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
@@ -63,3 +63,8 @@ stages:
             displayName: Publish the results to the build summary
             inputs:
               pollingTimeoutSec: '300'
+          - task: PublishCodeCoverageResults@1
+            displayName: 'Publish code coverage from ${System.DefaultWorkingDirectory}/**/reports/jacoco/test/jacocoTestReport.xml'
+            inputs:
+              summaryFileLocation: '${System.DefaultWorkingDirectory}/**/reports/jacoco/test/jacocoTestReport.xml'
+              reportDirectory: '${System.DefaultWorkingDirectory}/**/reports/jacoco/test/html'
