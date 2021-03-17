@@ -1,12 +1,20 @@
-version: "3.1"
+version: '3.5'
 
 services:
-  nginx:
-    image: nginx:stable-alpine
-    container_name: nginx
-    restart: always
+  ms-prueba-cloud:
+    image: $NOMBRE_IMAGEN
     ports:
-      - "80:80"
-      - "443:443"
+      - '8080:8080'
+    #volumes:
+    #  - "$PWD/application.properties:/application.properties"
+    #  - "$PWD/log4j2.xml:/log4j2.xml"
+    #  - "/home/Data/ms-admin-inmedss:/var/datos"
+    #  - "/home/FileServerPublico:/var/datosPublico"
+    #  - "/var/log/deploy/ms-admin-inmedss:/var/log/msa"
     deploy:
-      replicas: 2
+      replicas: 4
+    networks:
+      - sso_swarm
+networks:
+  sso_swarm:
+    name: sso_swarm

@@ -160,8 +160,8 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                docker service rm $(serviceDeploy)
-                docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
+                docker service rm $(artifactId)_$(keySwarmDeploy)
+                docker stack deploy -c docker-compose.yml $(artifactId)_$(keySwarmDeploy)
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
@@ -176,7 +176,7 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                docker service rm $(serviceDeploy)
+                docker service rm $(artifactId)_$(keySwarmDeploy)
               failOnStdErr: false
             continueOnError: true
           - task: SSH@0
@@ -185,4 +185,4 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                env NOMBRE_IMAGEN=$(nombreImagen) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
+                env NOMBRE_IMAGEN=$(artifactId) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)

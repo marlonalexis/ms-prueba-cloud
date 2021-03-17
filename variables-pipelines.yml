@@ -2,8 +2,7 @@ variables:
   hostDockerRegistry: marlonpluasregistry.azurecr.io
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.Repository.Name)
-  keySwarmDeploy: nginx
-  serviceDeploy: nginx_$(keySwarmDeploy)
+  keySwarmDeploy: sso
   sonarKeyProject: mpluasgu_ms-prueba-cloud
   artifactId: ''
   version: ''
