@@ -97,8 +97,9 @@ stages:
               $packaging=$pomXml.project.packaging
               Write-Host "##vso[task.setvariable variable=packaging]$packaging"
               # nombreImagen
-              $nombreImagen=$artifactId+":"+$version
+              $nombreImagen=$(artifactId)+":"+$(version)
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+              Write-Host ${System.DefaultWorkingDirectory}
             displayName: Initializing variables
           - task: Cache@2
             inputs:
