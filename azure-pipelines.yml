@@ -24,7 +24,7 @@ stages:
               path: $(mavenCacheFolder)
             displayName: Cache Maven
           - task: Maven@3
-            displayName: 'Validar estructura maven'
+            displayName: Validate maven structure
             inputs:
               goals: validate
               options: '-Dmaven.test.skip=true'
@@ -42,15 +42,15 @@ stages:
               path: $(mavenCacheFolder)
             displayName: Cache Maven
           - task: SonarCloudPrepare@1
-            displayName: 'Preparar análisis en SonarCloud'
+            displayName: Prepare analysis in SonarCloud
             inputs:
               SonarCloud: 'mpluasgu_ms-prueba-cloud'
               organization: 'mpluasgu'
               scannerMode: Other
           - task: Maven@3
-            displayName: 'Pruebas unitarias'
+            displayName: Unit tests
             inputs:
-              goals: verify
+              goals: install verify
               options: 'sonar:sonar -Dsonar.projectKey=$(sonarKeyProject)'
               testResultsFiles: '**/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
@@ -60,6 +60,6 @@ stages:
               sqMavenPluginVersionChoice: pom
               checkStyleRunAnalysis: true
           - task: SonarCloudPublish@1
-            displayName: 'Publicar los resultados en el resumen de la compilación'
+            displayName: Publish the results to the build summary
             inputs:
               pollingTimeoutSec: '300'
