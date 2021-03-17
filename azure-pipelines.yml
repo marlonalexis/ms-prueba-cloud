@@ -63,9 +63,34 @@ stages:
               sshEndpoint: marlonpluasvm1
               targetFolder: deploy
 
+  - stage: Build
+    displayName: Build Copy
+    jobs:
+      - job: Build
+        displayName: Build job
+        steps:
+          - task: Docker@2
+            displayName: login
+            inputs:
+              containerRegistry: marlonpluasregistry
+              command: login
+          - task: Docker@2
+            displayName: build
+            inputs:
+              containerRegistry: marlonpluasregistry
+              repository: prueba
+              command: build
+              #arguments: '--build-arg artifactId=$artifactId --build-arg version=$version'
+          - task: Docker@2
+            displayName: push
+            inputs:
+              containerRegistry: marlonpluasregistry
+              repository: prueba
+              command: push
+
   - stage: Deploy_Test
     displayName: Stage Deploy Test
-    dependsOn: Copy
+    dependsOn: Build
     condition: and(succeeded(), eq(variables.branch, 'main'))
     jobs:
       - job: Deploy
@@ -82,7 +107,7 @@ stages:
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
-    dependsOn: Copy
+    dependsOn: Build
     jobs:
       - job: Deploy
         displayName: Deploy job
