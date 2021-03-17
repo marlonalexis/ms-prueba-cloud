@@ -33,14 +33,6 @@ stages:
       - job: Test
         displayName: Test job
         steps:
-          - task: Cache@2
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
           - task: SonarCloudPrepare@1
             displayName: Prepare analysis in SonarCloud
             inputs:
@@ -67,7 +59,7 @@ stages:
             displayName: Publish code coverage
             inputs:
               summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/jacoco.xml'
-              reportDirectory: '$(System.DefaultWorkingDirectory)/**/'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/**/site/jacoco'
   - stage: Build
     displayName: Stage Build
     jobs:
@@ -121,6 +113,7 @@ stages:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: build
+              tags: $(version)
               arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
           - task: Docker@2
             displayName: Push docker image $(nombreImagen)
