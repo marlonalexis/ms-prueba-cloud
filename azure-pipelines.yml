@@ -46,7 +46,6 @@ stages:
               publishJUnitResults: true
               mavenAuthenticateFeed: false
               effectivePomSkip: false
-              sonarQubeRunAnalysis: true
               sqMavenPluginVersionChoice: pom
               codeCoverageToolOption: 'JaCoCo'
               testResultsFiles: '**/TEST-*.xml'
