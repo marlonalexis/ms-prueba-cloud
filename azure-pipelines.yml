@@ -9,8 +9,8 @@ variables:
   - template: variables-pipelines.yml
 
 stages:
-  - stage: Maven
-    displayName: Stage Maven
+  - stage: Development
+    displayName: Stage Development
     jobs:
       - job: Maven
         displayName: Maven job
@@ -22,68 +22,17 @@ stages:
                 maven | "$(Agent.OS)"
                 maven
               path: $(mavenCacheFolder)
-            displayName: Cache Maven local repo
-          - task: SonarCloudPrepare@1
-            displayName: 'Prepare analysis on SonarCloud'
-            inputs:
-              SonarCloud: 'mpluasgu_ms-prueba-cloud'
-              organization: 'mpluasgu'
-              scannerMode: Other
-
+            displayName: Cache Maven
           - task: Maven@3
-            displayName: 'Execute Maven goal'
+            displayName: 'Validar estructura maven'
             inputs:
-              mavenPomFile: 'pom.xml'
-              options: '-Dmaven.test.failure.ignore=true'
-              mavenOptions: '-Xmx3072m'
-              mavenVersionOption: 'Default'
-              publishJUnitResults: true
-              mavenAuthenticateFeed: false
-              effectivePomSkip: false
-              testResultsFiles: '**/TEST-*.xml'
-              goals: 'clean verify sonar:sonar -Dsonar.projectKey=$(sonarKeyProject)'
-
-          - task: SonarCloudPublish@1
-            displayName: 'Publish results on build summary'
-            inputs:
-              pollingTimeoutSec: '300'
-
-  - stage: Copy
-    displayName: Stage Copy
-    jobs:
-      - job: Copy
-        displayName: Copy job
+              goals: validate
+              options: '-Dmaven.test.skip=true'
+              publishJUnitResults: false
+              checkStyleRunAnalysis: true
+      - job: Test
+        displayName: Test job
         steps:
-          - task: CopyFilesOverSSH@0
-            displayName: 'Securely copy files to the remote machine'
-            inputs:
-              sshEndpoint: marlonpluasvm1
-              targetFolder: deploy
-
-  - stage: Build
-    displayName: Build Copy
-    jobs:
-      - job: Build
-        displayName: Build job
-        steps:
-          - powershell: |
-              [xml]$pomXml = Get-Content .\pom.xml
-              # artifactId
-              Write-Host $pomXml.project.artifactId
-              $artifactId=$pomXml.project.artifactId
-              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
-              # version
-              Write-Host $pomXml.project.version
-              $version=$pomXml.project.version
-              Write-Host "##vso[task.setvariable variable=version]$version"
-              # packaging
-              Write-Host $pomXml.project.packaging
-              $packaging=$pomXml.project.packaging
-              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
-              # nombreImagen
-              $nombreImagen=$artifactId+":"+$version
-              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
-            displayName: 'Inicializando variables'
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -91,57 +40,26 @@ stages:
                 maven | "$(Agent.OS)"
                 maven
               path: $(mavenCacheFolder)
-            displayName: Cache Maven local repo
-          - script: mvn install -B -e
-          - task: Docker@2
-            displayName: login
+            displayName: Cache Maven
+          - task: SonarCloudPrepare@1
+            displayName: 'Preparar análisis en SonarCloud'
             inputs:
-              containerRegistry: marlonpluasregistry
-              command: login
-          - task: Docker@2
-            displayName: build
+              SonarCloud: 'mpluasgu_ms-prueba-cloud'
+              organization: 'mpluasgu'
+              scannerMode: Other
+          - task: Maven@3
+            displayName: 'Pruebas unitarias'
             inputs:
-              containerRegistry: marlonpluasregistry
-              repository: $(artifactId)
-              command: build
-              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
-          - task: Docker@2
-            displayName: push
+              goals: verify
+              options: 'sonar:sonar -Pcoverage -Dsonar.projectKey=$(sonarKeyProject)'
+              testResultsFiles: '**/TEST-*.xml'
+              codeCoverageToolOption: JaCoCo
+              codeCoverageRestoreOriginalPomXml: true
+              sonarQubeRunAnalysis: true
+              isJacocoCoverageReportXML: true
+              sqMavenPluginVersionChoice: pom
+              checkStyleRunAnalysis: true
+          - task: SonarCloudPublish@1
+            displayName: 'Publicar los resultados en el resumen de la compilación'
             inputs:
-              containerRegistry: marlonpluasregistry
-              repository: $(artifactId)
-              command: push
-
-  - stage: Deploy_Test
-    displayName: Stage Deploy Test
-    dependsOn: Build
-    condition: and(succeeded(), eq(variables.branch, 'main'))
-    jobs:
-      - job: Deploy
-        displayName: Deploy job
-        steps:
-          - task: SSH@0
-            displayName: 'Run shell commands on remote machine'
-            inputs:
-              sshEndpoint: marlonpluasvm1
-              commands: |
-                cd deploy
-                docker service rm $(serviceDeploy)
-                docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
-
-  - stage: Deploy_Prod
-    displayName: Stage Deploy Prod
-    dependsOn: Build
-    jobs:
-      - job: Deploy
-        displayName: Deploy job
-        steps:
-          - task: SSH@0
-            displayName: 'Run shell commands on remote machine'
-            inputs:
-              sshEndpoint: marlonpluasvm1
-              commands: |
-                cd deploy
-                docker service rm $(serviceDeploy)
-                env NOMBRE_IMAGEN=$(nombreImagen) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
-
+              pollingTimeoutSec: '300'
