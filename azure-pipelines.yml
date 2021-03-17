@@ -51,7 +51,7 @@ stages:
             displayName: Unit tests
             inputs:
               goals: install verify
-              #options: 'sonar:sonar -Dsonar.projectKey=$(sonarKeyProject)'
+              options: '-Dsonar.projectKey=$(sonarKeyProject)'
               testResultsFiles: '**/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
               codeCoverageRestoreOriginalPomXml: true
