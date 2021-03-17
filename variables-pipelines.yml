@@ -1,4 +1,6 @@
 variables:
+  MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+  MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.Repository.Name)
   keySwarmDeploy: nginx
