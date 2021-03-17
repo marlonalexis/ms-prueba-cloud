@@ -39,8 +39,10 @@ stages:
               Write-Host "##vso[task.setvariable variable=packaging]$packaging"
               # nombreImagen
               $nombreImagen=$artifactId+":"+$version
+              Write-Host $nombreImagen
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
               Write-Host ${System.DefaultWorkingDirectory}
+              Write-Host $(System.DefaultWorkingDirectory)
             displayName: Initializing variables
           - task: Cache@2
             inputs:
