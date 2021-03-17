@@ -11,6 +11,7 @@ variables:
   serviceDeploy1: nginx
   serviceDeploy: nginx_nginx
   sonarKeyProject: mpluasgu_ms-prueba-cloud
+  version: ''
 
 stages:
   - stage: Maven
