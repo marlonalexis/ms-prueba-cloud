@@ -71,8 +71,8 @@ stages:
   - stage: Build
     displayName: Stage Build container
     jobs:
-      - job: Download code
-        displayName: Download code job
+      - job: Download
+        displayName: Download repository job
         steps:
           - task: CopyFilesOverSSH@0
             displayName: Securely copy files to the remote machine
