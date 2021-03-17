@@ -9,65 +9,6 @@ variables:
   - template: variables-pipelines.yml
 
 stages:
-  - stage: Development
-    displayName: Stage Development
-    jobs:
-      - job: Maven
-        displayName: Maven job
-        steps:
-          - task: Cache@2
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
-          - task: Maven@3
-            displayName: Validate maven structure
-            inputs:
-              goals: validate
-              options: '-Dmaven.test.skip=true'
-              publishJUnitResults: false
-              checkStyleRunAnalysis: true
-      - job: Test
-        displayName: Test job
-        steps:
-          - task: Cache@2
-            inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
-          - task: SonarCloudPrepare@1
-            displayName: Prepare analysis in SonarCloud
-            inputs:
-              SonarCloud: 'mpluasgu_ms-prueba-cloud'
-              organization: 'mpluasgu'
-              scannerMode: Other
-          - task: Maven@3
-            displayName: Unit tests
-            inputs:
-              goals: verify install
-              options: '-Dsonar.projectKey=$(sonarKeyProject)'
-              testResultsFiles: '**/TEST-*.xml'
-              codeCoverageToolOption: JaCoCo
-              codeCoverageRestoreOriginalPomXml: true
-              sonarQubeRunAnalysis: true
-              isJacocoCoverageReportXML: true
-              sqMavenPluginVersionChoice: pom
-              checkStyleRunAnalysis: true
-          - task: SonarCloudPublish@1
-            displayName: Publish the results to the build summary
-            inputs:
-              pollingTimeoutSec: '300'
-          - task: PublishCodeCoverageResults@1
-            displayName: Publish code coverage
-            inputs:
-              summaryFileLocation: '${System.DefaultWorkingDirectory}/**/jacoco.xml'
-              reportDirectory: '${System.DefaultWorkingDirectory}/**/'
   - stage: Build
     displayName: Stage Build
     jobs:
@@ -97,7 +38,7 @@ stages:
               $packaging=$pomXml.project.packaging
               Write-Host "##vso[task.setvariable variable=packaging]$packaging"
               # nombreImagen
-              $nombreImagen=$(artifactId)+":"+$(version)
+              $nombreImagen=$artifactId+":"+$version
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
               Write-Host ${System.DefaultWorkingDirectory}
             displayName: Initializing variables
