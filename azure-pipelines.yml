@@ -29,7 +29,6 @@ stages:
               goals: validate
               options: '-Dmaven.test.skip=true'
               publishJUnitResults: false
-              checkStyleRunAnalysis: true
       - job: Test
         displayName: Test job
         dependsOn: Maven
@@ -58,8 +57,6 @@ stages:
               codeCoverageRestoreOriginalPomXml: true
               sonarQubeRunAnalysis: true
               isJacocoCoverageReportXML: true
-              sqMavenPluginVersionChoice: pom
-              checkStyleRunAnalysis: true
           - task: SonarCloudPublish@1
             displayName: Publish the results to the build summary
             inputs:
@@ -113,7 +110,12 @@ stages:
                 maven
               path: $(mavenCacheFolder)
             displayName: Cache maven
-          - script: mvn install -B -e
+          - task: Maven@3
+            displayName: Generate dependencies
+            inputs:
+              goals: install
+              options: '-Dmaven.test.skip=true'
+              publishJUnitResults: false
           - task: Docker@2
             displayName: Login container registry
             inputs:
