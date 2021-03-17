@@ -66,5 +66,16 @@ stages:
           - task: PublishCodeCoverageResults@1
             displayName: 'Publish code coverage'
             inputs:
-              summaryFileLocation: '${System.DefaultWorkingDirectory}/**/site/jacoco/jacoco.xml'
-              reportDirectory: '${System.DefaultWorkingDirectory}/**/site/jacoco'
+              summaryFileLocation: '${System.DefaultWorkingDirectory}/**/jacoco.xml'
+              reportDirectory: '${System.DefaultWorkingDirectory}/**/'
+  - stage: Build container
+    displayName: Stage Build container
+    jobs:
+      - job: Download code
+        displayName: Download code job
+        steps:
+          - task: CopyFilesOverSSH@0
+            displayName: 'Securely copy files to the remote machine'
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              targetFolder: deploy
