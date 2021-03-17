@@ -62,30 +62,24 @@ stages:
             inputs:
               containerRegistry: marlonpluasregistry
               command: login
-          #- script: "docker pull $(artifactId)"
-          #  displayName: Pull latest for layer caching
-          #  continueOnError: true # for first build, no cache
+          - script: "docker pull $(artifactId)"
+            displayName: Pull latest for layer caching
+            continueOnError: true # for first build, no cache
           - task: Docker@2
             displayName: Build docker image $(nombreImagen)
             inputs:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: build
-              ${{ if eq(variables.branch, 'main') }}:
-                tags: 'latest'
-              ${{ if ne(variables.branch, 'main') }}:
-                tags: $(version)
-              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
+              tags: $(version)
+              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version) --cache-from=$(artifactId)'
           - task: Docker@2
             displayName: Push docker image $(nombreImagen)
             inputs:
               containerRegistry: marlonpluasregistry
               repository: $(artifactId)
               command: push
-              ${{ if eq(variables.branch, 'main') }}:
-                tags: 'latest'
-              ${{ if ne(variables.branch, 'main') }}:
-                tags: $(version)
+              tags: $(version)
 
   - stage: Deploy_Test
     displayName: Stage Deploy Test
