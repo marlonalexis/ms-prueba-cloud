@@ -40,9 +40,6 @@ stages:
               options: '-Dmaven.test.failure.ignore=true'
               mavenOptions: '-Xmx3072m'
               mavenVersionOption: 'Default'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '1.8'
-              jdkArchitectureOption: 'x64'
               publishJUnitResults: true
               mavenAuthenticateFeed: false
               effectivePomSkip: false
