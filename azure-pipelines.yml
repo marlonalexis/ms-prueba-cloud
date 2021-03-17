@@ -30,7 +30,7 @@ stages:
             displayName: 'Prepare analysis on SonarCloud'
             inputs:
               SonarCloud: 'mpluasgu_ms-prueba-cloud'
-              organization: $(sonarKeyProject)
+              organization: 'mpluasgu'
               scannerMode: Other
 
           - task: Maven@3
