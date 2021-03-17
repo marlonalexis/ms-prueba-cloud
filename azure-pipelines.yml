@@ -51,7 +51,7 @@ stages:
             displayName: 'Pruebas unitarias'
             inputs:
               goals: verify
-              options: 'sonar:sonar -Pcoverage -Dsonar.projectKey=$(sonarKeyProject)'
+              options: 'sonar:sonar -Dsonar.projectKey=$(sonarKeyProject)'
               testResultsFiles: '**/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
               codeCoverageRestoreOriginalPomXml: true
