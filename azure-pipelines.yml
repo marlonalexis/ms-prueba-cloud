@@ -17,6 +17,28 @@ stages:
   - stage: Maven
     displayName: Stage Maven
     jobs:
+      - powershell: |
+          [xml]$pomXml = Get-Content .\pom.xml
+          # artifactId
+          Write-Host $pomXml.project.artifactId
+          $artifactId=$pomXml.project.artifactId
+          Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
+          # version
+          Write-Host $pomXml.project.version
+          $version=$pomXml.project.version
+          Write-Host "##vso[task.setvariable variable=version]$version"
+          # version
+          Write-Host $pomXml.project.version
+          $version=$pomXml.project.version
+          Write-Host "##vso[task.setvariable variable=version]$version"
+          # packaging
+          Write-Host $pomXml.project.packaging
+          $packaging=$pomXml.project.packaging
+          Write-Host "##vso[task.setvariable variable=packaging]$packaging"
+          # nombreImagen
+          $nombreImagen=$artifactId:$version;
+          Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+        displayName: 'PowerShell Script'
       - job: Maven
         displayName: Maven job
         steps:
@@ -71,13 +93,6 @@ stages:
       - job: Build
         displayName: Build job
         steps:
-          - powershell: |
-              [xml]$pomXml = Get-Content .\pom.xml
-              # version
-              Write-Host $pomXml.project.version
-              $version=$pomXml.project.version
-              Write-Host "##vso[task.setvariable variable=version]$version"
-            displayName: 'PowerShell Script'
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -96,14 +111,14 @@ stages:
             displayName: build
             inputs:
               containerRegistry: marlonpluasregistry
-              repository: prueba
+              repository: $(artifactId)
               command: build
-              arguments: '--build-arg version=$(version)'
+              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
           - task: Docker@2
             displayName: push
             inputs:
               containerRegistry: marlonpluasregistry
-              repository: prueba
+              repository: $(artifactId)
               command: push
 
   - stage: Deploy_Test
@@ -137,5 +152,5 @@ stages:
               commands: |
                 cd deploy
                 docker service rm $(serviceDeploy)
-                docker stack deploy -c docker-compose.yml $(serviceDeploy1)
+                docker stack deploy -c NOMBRE_IMAGEN=$(nombreImagen) docker-compose.yml $(serviceDeploy1)
 

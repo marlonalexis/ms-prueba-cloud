@@ -12,6 +12,7 @@
     <groupId>ec.marlonpluas</groupId>
     <artifactId>ms-prueba-cloud</artifactId>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
     <name>ms-prueba-cloud</name>
     <description>Demo ms prueba cloud</description>
 
