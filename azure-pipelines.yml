@@ -20,7 +20,7 @@ stages:
             displayName: Securely copy files to the remote machine
             inputs:
               sshEndpoint: marlonpluasvm1
-              targetFolder: deploy
+              targetFolder: $(keySwarmDeploy)_$(serviceSwarm)
       - job: Build
         displayName: Build Container job
         steps:
@@ -105,7 +105,6 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                cd deploy
                 docker service rm $(artifactId)_$(keySwarmDeploy)
                 docker stack deploy -c docker-compose.yml $(artifactId)_$(keySwarmDeploy)
 
@@ -166,5 +165,5 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                cd deploy
-                env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
+                env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $
+                (keySwarmDeploy)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeploy)
