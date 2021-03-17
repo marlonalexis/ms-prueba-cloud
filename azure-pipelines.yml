@@ -32,6 +32,7 @@ stages:
               checkStyleRunAnalysis: true
       - job: Test
         displayName: Test job
+        dependsOn: Maven
         steps:
           - task: SonarCloudPrepare@1
             displayName: Prepare analysis in SonarCloud
@@ -60,8 +61,10 @@ stages:
             inputs:
               summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/jacoco.xml'
               reportDirectory: '$(System.DefaultWorkingDirectory)/**/site/jacoco'
+
   - stage: Build
     displayName: Stage Build
+    dependsOn: Development
     jobs:
       - job: Download
         displayName: Download Repository job
@@ -122,3 +125,36 @@ stages:
               repository: $(artifactId)
               command: push
               tags: $(version)
+
+  - stage: Deploy_Test
+    displayName: Stage Deploy Test
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables.branch, 'main'))
+    jobs:
+      - job: Deploy
+        displayName: Deploy job
+        steps:
+          - task: SSH@0
+            displayName: 'Run shell commands on remote machine'
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                cd deploy
+                docker service rm $(serviceDeploy)
+                docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
+
+  - stage: Deploy_Prod
+    displayName: Stage Deploy Prod
+    dependsOn: Build
+    jobs:
+      - job: Deploy
+        displayName: Deploy job
+        steps:
+          - task: SSH@0
+            displayName: 'Run shell commands on remote machine'
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                cd deploy
+                docker service rm $(serviceDeploy)
+                env NOMBRE_IMAGEN=$(nombreImagen) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
