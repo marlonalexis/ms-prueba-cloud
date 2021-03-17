@@ -6,11 +6,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  mavenCacheFolder: $(HOME)/.m2/repository
-  branch: $(Build.Repository.Name)
-  keySwarmDeploy: nginx
-  serviceDeploy: nginx_$(keySwarmDeploy)
-  sonarKeyProject: mpluasgu_ms-prueba-cloud
+  - template: variables-pipelines.yml
 
 stages:
   - stage: Maven
@@ -70,24 +66,6 @@ stages:
       - job: Build
         displayName: Build job
         steps:
-          - powershell: |
-              [xml]$pomXml = Get-Content .\pom.xml
-              # artifactId
-              Write-Host $pomXml.project.artifactId
-              $artifactId=$pomXml.project.artifactId
-              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
-              # version
-              Write-Host $pomXml.project.version
-              $version=$pomXml.project.version
-              Write-Host "##vso[task.setvariable variable=version]$version"
-              # packaging
-              Write-Host $pomXml.project.packaging
-              $packaging=$pomXml.project.packaging
-              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
-              # nombreImagen
-              $nombreImagen=$artifactId+":"+$version
-              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
-            displayName: 'Inicializando variables'
           - task: Cache@2
             inputs:
               key: 'maven | "$(Agent.OS)" | **/pom.xml'
@@ -147,5 +125,5 @@ stages:
               commands: |
                 cd deploy
                 docker service rm $(serviceDeploy)
-                docker stack deploy -c NOMBRE_IMAGEN=$(nombreImagen) docker-compose.yml $(keySwarmDeploy)
+                env NOMBRE_IMAGEN=$(nombreImagen) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
 

@@ -1,0 +1,26 @@
+variables:
+  mavenCacheFolder: $(HOME)/.m2/repository
+  branch: $(Build.Repository.Name)
+  keySwarmDeploy: nginx
+  serviceDeploy: nginx_$(keySwarmDeploy)
+  sonarKeyProject: mpluasgu_ms-prueba-cloud
+
+steps:
+  - powershell: |
+      [xml]$pomXml = Get-Content .\pom.xml
+      # artifactId
+      Write-Host $pomXml.project.artifactId
+      $artifactId=$pomXml.project.artifactId
+      Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
+      # version
+      Write-Host $pomXml.project.version
+      $version=$pomXml.project.version
+      Write-Host "##vso[task.setvariable variable=version]$version"
+      # packaging
+      Write-Host $pomXml.project.packaging
+      $packaging=$pomXml.project.packaging
+      Write-Host "##vso[task.setvariable variable=packaging]$packaging"
+      # nombreImagen
+      $nombreImagen=$artifactId+":"+$version
+      Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+    displayName: 'Inicializando variables'
