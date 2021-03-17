@@ -175,8 +175,15 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                cd deploy
-                docker service rm $(artifactId)_$(keySwarmDeploy)
+                docker service rm $(keySwarmDeploy)_$(serviceSwarm)
+              failOnStdErr: false
+            continueOnError: true
+          - task: SSH@0
+            displayName: Pull image
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                docker pull $(hostDockerRegistry)/$(artifactId):$(version)
               failOnStdErr: false
             continueOnError: true
           - task: SSH@0
@@ -185,4 +192,4 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 cd deploy
-                env NOMBRE_IMAGEN=$(artifactId) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)
+                env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(artifactId):$(version) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c docker-compose.yml $(keySwarmDeploy)

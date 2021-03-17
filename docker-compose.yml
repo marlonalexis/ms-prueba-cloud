@@ -1,7 +1,7 @@
 version: '3.5'
 
 services:
-  ms-prueba-cloud:
+  cloud:
     image: $NOMBRE_IMAGEN
     ports:
       - '8080:8080'
@@ -12,9 +12,4 @@ services:
     #  - "/home/FileServerPublico:/var/datosPublico"
     #  - "/var/log/deploy/ms-admin-inmedss:/var/log/msa"
     deploy:
-      replicas: 4
-    networks:
-      - sso_swarm
-networks:
-  sso_swarm:
-    name: sso_swarm
+      replicas: $REPLICAS
