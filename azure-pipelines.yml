@@ -43,7 +43,7 @@ stages:
               Write-Host $nombreImagen
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
               # tagImagen
-              if eq(variables['Build.SourceBranchName'], 'main')
+              if (eq(variables['Build.SourceBranchName'], 'main'))
               {
                 $tagImagen="latest"
               }
