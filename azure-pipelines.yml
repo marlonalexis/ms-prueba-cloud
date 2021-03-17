@@ -45,8 +45,7 @@ stages:
               # tagImagen
               Write-Host $(Build.SourceBranchName)
               Write-Host $(branch)
-              Write-Host variable.branch
-              if (eq('$(Build.SourceBranchName)', 'main'))
+              if eq($(Build.SourceBranchName), 'main')
               {
                 $tagImagen="latest"
               }
