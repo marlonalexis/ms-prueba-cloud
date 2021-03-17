@@ -46,8 +46,6 @@ stages:
               publishJUnitResults: true
               mavenAuthenticateFeed: false
               effectivePomSkip: false
-              sqMavenPluginVersionChoice: pom
-              codeCoverageToolOption: 'JaCoCo'
               testResultsFiles: '**/TEST-*.xml'
               goals: 'clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=$(sonarKeyProject)'
 
