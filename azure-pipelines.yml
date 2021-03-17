@@ -28,9 +28,7 @@ stages:
                 maven
               path: $(mavenCacheFolder)
             displayName: Cache Maven local repo
-
           - script: mvn install -B -e
-
           - task: SonarCloudPrepare@1
             displayName: 'Prepare analysis on SonarCloud'
             inputs:
@@ -77,8 +75,17 @@ stages:
           - powershell: |
               [xml]$pomXml = Get-Content .\pom.xml
               $version = [version]$pomXml.project.version
-
+              Write-Host '##vso[task.setvariable variable=version;isOutput=true]$version'
             displayName: 'PowerShell Script'
+          - task: Cache@2
+            inputs:
+              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(mavenCacheFolder)
+            displayName: Cache Maven local repo
+          - script: mvn install -B -e
           - task: Maven@3
             displayName: 'Maven pom.xml'
             inputs:
