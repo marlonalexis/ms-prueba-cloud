@@ -3,9 +3,7 @@ MAINTAINER mpluasgu@hotmail.com
 RUN mkdir -p /var/log/msa
 ARG artifactId
 ARG version
-ENV artifactId="ms-prueba-cloud"
-ENV version="1.0.0"
-ADD target/ms-prueba-cloud-1.0.0.jar app.jar
+ADD target/ms-prueba-cloud-${version}.jar app.jar
 ENV TIMEZONE="America/Guayaquil"
 RUN apk update && apk add tzdata
 RUN rm -rf /etc/localtime \
