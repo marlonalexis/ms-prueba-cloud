@@ -10,6 +10,7 @@ variables:
   branch: $(Build.Repository.Name)
   serviceDeploy1: nginx
   serviceDeploy: nginx_nginx
+  sonarKeyProject: mpluasgu_ms-prueba-cloud
 
 stages:
   - stage: Maven
@@ -29,7 +30,7 @@ stages:
             displayName: 'Prepare analysis on SonarCloud'
             inputs:
               SonarCloud: 'mpluasgu_ms-prueba-cloud'
-              organization: 'mpluasgu_ms-prueba-cloud'
+              organization: $(sonarKeyProject)
               scannerMode: Other
 
           - task: Maven@3
@@ -49,7 +50,7 @@ stages:
               sqMavenPluginVersionChoice: pom
               codeCoverageToolOption: 'JaCoCo'
               testResultsFiles: '**/TEST-*.xml'
-              goals: 'verify'
+              goals: 'clean verify sonar:sonar -Pcoverage -Dsonar.projectKey=$(sonarKeyProject)'
 
           - task: SonarCloudPublish@1
             displayName: 'Publish results on build summary'
