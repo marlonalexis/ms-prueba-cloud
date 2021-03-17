@@ -64,7 +64,7 @@ stages:
             inputs:
               pollingTimeoutSec: '300'
           - task: PublishCodeCoverageResults@1
-            displayName: 'Publish code coverage from ${System.DefaultWorkingDirectory}/**/reports/jacoco/test/jacocoTestReport.xml'
+            displayName: 'Publish code coverage'
             inputs:
-              summaryFileLocation: '${System.DefaultWorkingDirectory}/**/reports/jacoco/test/jacocoTestReport.xml'
-              reportDirectory: '${System.DefaultWorkingDirectory}/**/reports/jacoco/test/html'
+              summaryFileLocation: '${System.DefaultWorkingDirectory}/**/site/jacoco/jacoco.xml'
+              reportDirectory: '${System.DefaultWorkingDirectory}/**/site/jacoco'
