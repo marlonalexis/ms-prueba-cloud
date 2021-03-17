@@ -127,15 +127,13 @@ stages:
               path: $(Pipeline.Workspace)/docker
               cacheHitVar: DOCKER_CACHE_RESTORED
             displayName: Caching Docker image
-
           - script: |
               docker load < $(Pipeline.Workspace)/docker/cache.tar
             condition: and(not(canceled()), eq(variables.DOCKER_CACHE_RESTORED, 'true'))
-
           - script: |
               mkdir -p $(Pipeline.Workspace)/docker
-              docker pull $(artifactId)
-              docker save $(artifactId) > $(Pipeline.Workspace)/docker/cache.tar
+              docker pull $(artifactId):$(version)
+              docker save $(artifactId):$(version) > $(Pipeline.Workspace)/docker/cache.tar
             condition: and(not(canceled()), or(failed(), ne(variables.DOCKER_CACHE_RESTORED, 'true')))
           - task: Docker@2
             displayName: Build docker image $(nombreImagen)
