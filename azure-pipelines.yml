@@ -22,7 +22,7 @@ stages:
                 maven | "$(Agent.OS)"
                 maven
               path: $(mavenCacheFolder)
-            displayName: Cache Maven
+            displayName: Cache maven
           - task: Maven@3
             displayName: Validate maven structure
             inputs:
@@ -40,7 +40,7 @@ stages:
                 maven | "$(Agent.OS)"
                 maven
               path: $(mavenCacheFolder)
-            displayName: Cache Maven
+            displayName: Cache maven
           - task: SonarCloudPrepare@1
             displayName: Prepare analysis in SonarCloud
             inputs:
@@ -69,10 +69,10 @@ stages:
               summaryFileLocation: '${System.DefaultWorkingDirectory}/**/jacoco.xml'
               reportDirectory: '${System.DefaultWorkingDirectory}/**/'
   - stage: Build
-    displayName: Stage Build container
+    displayName: Stage Build
     jobs:
       - job: Download
-        displayName: Download repository job
+        displayName: Download Repository job
         steps:
           - task: CopyFilesOverSSH@0
             displayName: Securely copy files to the remote machine
@@ -100,3 +100,30 @@ stages:
               $nombreImagen=$artifactId+":"+$version
               Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
             displayName: Initializing variables
+          - task: Cache@2
+            inputs:
+              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(mavenCacheFolder)
+            displayName: Cache maven
+          - script: mvn install -B -e
+          - task: Docker@2
+            displayName: Login container registry
+            inputs:
+              containerRegistry: marlonpluasregistry
+              command: login
+          - task: Docker@2
+            displayName: Build docker image $(nombreImagen)
+            inputs:
+              containerRegistry: marlonpluasregistry
+              repository: $(nombreImagen)
+              command: build
+              arguments: '--build-arg artifactId=$(artifactId) --build-arg version=$(version)'
+          - task: Docker@2
+            displayName: Push docker image $(nombreImagen)
+            inputs:
+              containerRegistry: marlonpluasregistry
+              repository: $(nombreImagen)
+              command: push
