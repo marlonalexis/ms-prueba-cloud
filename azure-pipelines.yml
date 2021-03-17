@@ -50,7 +50,7 @@ stages:
           - task: Maven@3
             displayName: Unit tests
             inputs:
-              goals: clean verify
+              goals: verify
               options: '-Dsonar.projectKey=$(sonarKeyProject)'
               testResultsFiles: '**/TEST-*.xml'
               codeCoverageToolOption: JaCoCo
