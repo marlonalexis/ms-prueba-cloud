@@ -172,4 +172,4 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeploy)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeploy)
+                env PWD=$(keySwarmDeploy)_$(serviceSwarm) env PUERTO_INT=$(puertoInt) env PUERTO_EXT=$(puertoExt) env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeploy)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeploy)

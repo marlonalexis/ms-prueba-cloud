@@ -7,6 +7,6 @@ services:
       - '$PUERTO_EXT:$PUERTO_INT'
     volumes:
       - "$PWD/application.properties:/application.properties"
-      - "$PWD/log4j2.xml:/log4j2.xml"
+      #- "$PWD/log4j2.xml:/log4j2.xml"
     deploy:
       replicas: $REPLICAS

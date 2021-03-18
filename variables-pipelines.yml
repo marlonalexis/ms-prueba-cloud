@@ -7,6 +7,10 @@ variables:
   keySwarmDeployTest: sso_test
   numReplicasSwarm: 2
   sonarKeyProject: mpluasgu_ms-prueba-cloud
+  puertoInt: 8080
+  puertoExt: 8080
+  puertoIntTest: 8081
+  puertoExtTest: 8081
   artifactId: ''
   version: ''
   packaging: ''
