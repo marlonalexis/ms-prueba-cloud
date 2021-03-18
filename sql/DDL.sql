@@ -25,14 +25,20 @@ CREATE TABLE `info_usuario` (
                                 `estado` varchar(45) NOT NULL,
                                 `fe_creacion` datetime NOT NULL,
                                 PRIMARY KEY (`id_usuario`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1 COMMENT='Tabla info de los usuarios'
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1 COMMENT='Tabla info de los usuarios';
 
 
-CREATE TABLE `pruebaCloud`.`info_transaccion` (
+CREATE TABLE `info_transaccion` (
                                                   `id_transaccion` VARCHAR(500) NOT NULL,
                                                   `username` VARCHAR(500) NOT NULL,
                                                   `estado` VARCHAR(45) NOT NULL,
                                                   `fe_creacion` DATETIME NOT NULL,
-                                                  `usr_modificacion` VARCHAR(45) NOT NULL,
+                                                  `usr_modificacion` VARCHAR(45) NULL,
                                                   `fe_modificacion` DATETIME NULL,
                                                   PRIMARY KEY (`id_transaccion`));
+
+CREATE TABLE `admi_api` (
+                                    `id_api` int(11) NOT NULL AUTO_INCREMENT,
+                                    `valor` VARCHAR(500) NOT NULL,
+                                    `estado` VARCHAR(45) NOT NULL,
+                                    PRIMARY KEY (`id_api`));

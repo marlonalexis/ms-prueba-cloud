@@ -11,7 +11,6 @@ public abstract class CoreUtilConstants {
     private CoreUtilConstants() {
     }
 
-    public static final String SCHEMA_PRUEBA_CLOUD = "pruebaCloud";
     public static final String TIMEZONE_DATE = "America/Guayaquil";
     public static final String MENSAJE_ERROR = "ERROR";
 }

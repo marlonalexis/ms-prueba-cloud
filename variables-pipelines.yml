@@ -2,14 +2,15 @@ variables:
   hostDockerRegistry: marlonpluasregistry.azurecr.io
   mavenCacheFolder: $(HOME)/.m2/repository
   branch: $(Build.SourceBranchName)
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/main')]
   serviceSwarm: cloud
   keySwarmDeploy: sso
   keySwarmDeployTest: sso_test
   numReplicasSwarm: 2
   sonarKeyProject: mpluasgu_ms-prueba-cloud
+  properties: application.properties
   puertoInt: 8080
   puertoExt: 8080
-  puertoIntTest: 8081
   puertoExtTest: 8081
   artifactId: ''
   version: ''

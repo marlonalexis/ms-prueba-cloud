@@ -10,8 +10,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import ec.marlonpluas.prueba.cloud.entity.AdmiApi;
 import ec.marlonpluas.prueba.cloud.entity.InfoTransaccion;
 import ec.marlonpluas.prueba.cloud.enums.Estado;
+import ec.marlonpluas.prueba.cloud.repository.AdmiApiRepository;
 import ec.marlonpluas.prueba.cloud.repository.InfoTransaccionRepository;
 import ec.marlonpluas.prueba.cloud.security.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +48,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Value("${jwt.header.apiKey}")
     private String jwtHeaderApiKey;
 
-    @Value("${jwt.apiKey.secret}")
-    private String jwtApiKeySecret;
-
     @Autowired
     private InfoTransaccionRepository infoTransaccionRepo;
+
+    @Autowired
+    private AdmiApiRepository admiApiRepo;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -65,8 +67,14 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (apiKeyHeader == null) {
             throw new AuthenticationException("ApiKey es requerido");
         } else {
-            if (!apiKeyHeader.equals(jwtApiKeySecret)) {
-                throw new AuthenticationException("ApiKey incorrecto");
+            Optional<AdmiApi> opApiKey = admiApiRepo.findByValor(apiKeyHeader);
+            if (opApiKey.isPresent()) {
+                AdmiApi apiKey = opApiKey.get();
+                if (!apiKey.getEstado().equalsIgnoreCase(Estado.Activo.toString())) {
+                    throw new AuthenticationException("ApiKey inactivo");
+                }
+            } else {
+                throw new AuthenticationException("ApiKey no existe");
             }
         }
 

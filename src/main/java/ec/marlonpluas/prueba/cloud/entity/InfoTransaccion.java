@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "info_transaccion", schema = CoreUtilConstants.SCHEMA_PRUEBA_CLOUD)
+@Table(name = "info_transaccion")
 public class InfoTransaccion {
     @Id
     @Column(name = "id_transaccion")

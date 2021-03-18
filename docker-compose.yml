@@ -10,3 +10,8 @@ services:
       #- "$PWD/log4j2.xml:/log4j2.xml"
     deploy:
       replicas: $REPLICAS
+    networks:
+      - sso
+networks:
+  sso:
+    external: true

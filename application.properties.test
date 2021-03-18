@@ -1,5 +1,5 @@
 #Port
-server.port=8081
+server.port=8080
 #Config
 correo.admin=prueba@hotmail.com
 user.admin=prueba
@@ -10,7 +10,7 @@ jwt.header.token=X-JWT-KWY
 jwt.header.apiKey=X-Parse-REST-API-Key
 jwt.apiKey.secret=2f5ae96c-b558-4c7b-a590-a501ae1c3f6c
 #Base inmedss
-cloud.datasource.jdbcUrl=jdbc:mysql://marlonpluasmysql.mysql.database.azure.com:3306/pruebaCloud?serverTimezone=UTC&createDatabaseIfNotExist=true&autoReconnect=true&useSSL=false
+cloud.datasource.jdbcUrl=jdbc:mysql://marlonpluasmysql.mysql.database.azure.com:3306/pruebacloudtest?serverTimezone=UTC&createDatabaseIfNotExist=true&autoReconnect=true&useSSL=false
 cloud.datasource.username=mpluasgu@marlonpluasmysql
 cloud.datasource.password=1a6aw/avu5
 #Datos datasource generales
