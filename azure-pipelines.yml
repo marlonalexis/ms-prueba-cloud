@@ -92,14 +92,68 @@ stages:
               command: push
               tags: $(tagImagen)
 
+  - stage: Releases
+    displayName: Stage Releases
+    dependsOn: Build
+    jobs:
+      - job: Releases
+        displayName: Releases job
+        steps:
+          - task: SSH@0
+            displayName: Pull image VM1
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                docker rmi -f $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
+                docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
+              failOnStdErr: false
+          - task: SSH@0
+            displayName: Pull image VM2
+            inputs:
+              sshEndpoint: marlonpluasvm2
+              commands: |
+                docker rmi -f $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
+                docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
+              failOnStdErr: false
+
   - stage: Deploy_Test
     displayName: Stage Deploy Test
-    dependsOn: Build
+    dependsOn: Releases
     condition: and(succeeded(), eq(variables.branch, 'main2'))
     jobs:
       - job: Deploy
         displayName: Deploy job
         steps:
+          - powershell: |
+              [xml]$pomXml = Get-Content .\pom.xml
+              # artifactId
+              Write-Host $pomXml.project.artifactId
+              $artifactId=$pomXml.project.artifactId
+              Write-Host "##vso[task.setvariable variable=artifactId]$artifactId"
+              # version
+              Write-Host $pomXml.project.version
+              $version=$pomXml.project.version
+              Write-Host "##vso[task.setvariable variable=version]$version"
+              # packaging
+              Write-Host $pomXml.project.packaging
+              $packaging=$pomXml.project.packaging
+              Write-Host "##vso[task.setvariable variable=packaging]$packaging"
+              # nombreImagen
+              $nombreImagen=$artifactId
+              Write-Host $nombreImagen
+              Write-Host "##vso[task.setvariable variable=nombreImagen]$nombreImagen"
+              # tagImagen
+              if ('$(Build.SourceBranchName)' -eq 'main')
+              {
+                $tagImagen="latest"
+              }
+              else
+              {
+                $tagImagen=$version
+              }
+              Write-Host $tagImagen
+              Write-Host "##vso[task.setvariable variable=tagImagen]$tagImagen"
+            displayName: Initializing variables
           - task: SSH@0
             displayName: 'Run shell commands on remote machine'
             inputs:
@@ -110,7 +164,7 @@ stages:
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
-    dependsOn: Build
+    dependsOn: Releases
     jobs:
       - job: Deploy
         displayName: Deploy job
@@ -153,20 +207,6 @@ stages:
                 docker service rm $(keySwarmDeploy)_$(serviceSwarm)
               failOnStdErr: false
             continueOnError: true
-          - task: SSH@0
-            displayName: Pull image VM1
-            inputs:
-              sshEndpoint: marlonpluasvm1
-              commands: |
-                docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
-              failOnStdErr: false
-          - task: SSH@0
-            displayName: Pull image VM2
-            inputs:
-              sshEndpoint: marlonpluasvm2
-              commands: |
-                docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
-              failOnStdErr: false
           - task: SSH@0
             displayName: Deploy swarm service
             inputs:
