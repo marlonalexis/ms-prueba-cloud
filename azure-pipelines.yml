@@ -20,9 +20,9 @@ stages:
             displayName: Securely copy files to the remote machine
             inputs:
               sshEndpoint: marlonpluasvm1
-              ${{ if eq($(branch), 'main') }}:
+              ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
                 targetFolder: $(keySwarmDeploy)_$(serviceSwarm)
-              ${{ if ne($(branch), 'main') }}:
+              ${{ if ne(variables['Build.SourceBranchName'], 'main') }}:
                 targetFolder: $(keySwarmDeployTest)_$(serviceSwarm)
       - job: Build
         displayName: Build Container job
