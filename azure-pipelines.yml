@@ -20,7 +20,10 @@ stages:
             displayName: Securely copy files to the remote machine
             inputs:
               sshEndpoint: marlonpluasvm1
-              targetFolder: $(keySwarmDeploy)_$(serviceSwarm)
+              ${{ if eq($(branch), 'main') }}:
+                targetFolder: $(keySwarmDeploy)_$(serviceSwarm)
+              ${{ if ne($(branch), 'main') }}:
+                targetFolder: $(keySwarmDeployTest)_$(serviceSwarm)
       - job: Build
         displayName: Build Container job
         steps:
@@ -149,7 +152,7 @@ stages:
   - stage: Deploy_Test
     displayName: Stage Deploy Test
     dependsOn: Releases
-    condition: and(succeeded(), eq(variables.branch, 'main2'))
+    condition: and(succeeded(), ne(variables.branch, 'main'))
     jobs:
       - job: Deploy
         displayName: Deploy job
@@ -185,16 +188,24 @@ stages:
               Write-Host "##vso[task.setvariable variable=tagImagen]$tagImagen"
             displayName: Initializing variables
           - task: SSH@0
-            displayName: 'Run shell commands on remote machine'
+            displayName: Validate and remove swarm service
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                docker service rm $(artifactId)_$(keySwarmDeploy)
-                docker stack deploy -c docker-compose.yml $(artifactId)_$(keySwarmDeploy)
+                docker service rm $(keySwarmDeployTest)_$(serviceSwarm)
+              failOnStdErr: false
+            continueOnError: true
+          - task: SSH@0
+            displayName: Deploy swarm service
+            inputs:
+              sshEndpoint: marlonpluasvm1
+              commands: |
+                env PWD=$(pwd)/$(keySwarmDeployTest)_$(serviceSwarm) env PUERTO_INT=$(puertoInt) env PUERTO_EXT=$(puertoExt) env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeployTest)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeployTest)
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
     dependsOn: Releases
+    condition: and(succeeded(), eq(variables.branch, 'main'))
     jobs:
       - job: Deploy
         displayName: Deploy job
