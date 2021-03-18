@@ -7,11 +7,13 @@ import org.springframework.stereotype.Repository;
 /**
  * Repositorio InfoUsuario
  *
- * @author Marlon Pluas
+ * @author Marlon Plúas
  * @version 1.0.0
+ * @since 15/03/2021
  */
 @Repository
 public interface InfoUsuarioRepository extends JpaRepository<InfoUsuario, Long> {
     boolean existsByUsernameIgnoreCase(String username);
+
     InfoUsuario findOneByUsername(String username);
 }

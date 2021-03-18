@@ -12,7 +12,7 @@ import javax.annotation.PostConstruct;
  *
  * @author Marlon Plúas
  * @version 1.0.0
- * @since 02/03/2020
+ * @since 15/03/2021
  */
 @EnableWebMvc
 @Configuration

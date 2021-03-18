@@ -15,6 +15,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
 
+/**
+ * Inicia microservicio
+ *
+ * @author Marlon Plúas
+ * @version 1.0.0
+ * @since 15/03/2021
+ */
 @SpringBootApplication
 @ComponentScan({ "ec.marlonpluas" })
 public class MsPruebaCloudApplication implements CommandLineRunner {

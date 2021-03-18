@@ -26,3 +26,13 @@ CREATE TABLE `info_usuario` (
                                 `fe_creacion` datetime NOT NULL,
                                 PRIMARY KEY (`id_usuario`)
 ) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=latin1 COMMENT='Tabla info de los usuarios'
+
+
+CREATE TABLE `pruebaCloud`.`info_transaccion` (
+                                                  `id_transaccion` VARCHAR(500) NOT NULL,
+                                                  `username` VARCHAR(500) NOT NULL,
+                                                  `estado` VARCHAR(45) NOT NULL,
+                                                  `fe_creacion` DATETIME NOT NULL,
+                                                  `usr_modificacion` VARCHAR(45) NOT NULL,
+                                                  `fe_modificacion` DATETIME NULL,
+                                                  PRIMARY KEY (`id_transaccion`));

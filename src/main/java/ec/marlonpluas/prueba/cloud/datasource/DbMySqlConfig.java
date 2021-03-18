@@ -25,9 +25,16 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+/**
+ * Configuración datasource mysql
+ *
+ * @author Marlon Plúas
+ * @version 1.0.0
+ * @since 15/03/2021
+ */
 @Configuration
 @EnableTransactionManagement
-@EnableJpaRepositories(entityManagerFactoryRef = "inmedssEMFactory", transactionManagerRef = "inmedssTM", basePackages = {
+@EnableJpaRepositories(entityManagerFactoryRef = "cloudEMFactory", transactionManagerRef = "cloudTM", basePackages = {
         "ec.marlonpluas.prueba.cloud.repository" })
 @EntityScan(basePackages = { "ec.marlonpluas.prueba.cloud.entity" })
 public class DbMySqlConfig {
@@ -52,19 +59,19 @@ public class DbMySqlConfig {
         return hibernateProperties;
     }
 
-    // INICIO CONFIGURACIÓN INMEDSS
+    // INICIO CONFIGURACIÓN CLOUD
     @Primary
-    @Bean(name = "dsInmedss")
-    public HikariDataSource dsInmedss(@Qualifier("dsInmedssProperties") HikariConfig dataSourceConfig) {
+    @Bean(name = "dsCloud")
+    public HikariDataSource dsCloud(@Qualifier("dsCloudProperties") HikariConfig dataSourceConfig) {
         return new HikariDataSource(dataSourceConfig);
     }
 
     @Primary
-    @Bean(name = "dsInmedssProperties")
-    @ConfigurationProperties("inmedss.datasource")
-    public HikariConfig dsInmedssConfig() {
+    @Bean(name = "dsCloudProperties")
+    @ConfigurationProperties("cloud.datasource")
+    public HikariConfig dsCloudConfig() {
         HikariConfig dataSourceConfig = new HikariConfig();
-        dataSourceConfig.setPoolName("dsInmedss");
+        dataSourceConfig.setPoolName("dsCloud");
         dataSourceConfig.setConnectionTimeout(connectionTimeout);
         dataSourceConfig.setIdleTimeout(idleTimeout);
         dataSourceConfig.setMaximumPoolSize(maxPoolSize);
@@ -75,24 +82,24 @@ public class DbMySqlConfig {
     }
 
     @Primary
-    @Bean(name = "jdbcInmedss")
+    @Bean(name = "jdbcCloud")
     @Autowired
-    public JdbcTemplate jdbcInmedssTemplate(@Qualifier("dsInmedss") DataSource dsInmedss) {
-        return new JdbcTemplate(dsInmedss);
+    public JdbcTemplate jdbcCloudTemplate(@Qualifier("dsCloud") DataSource dsCloud) {
+        return new JdbcTemplate(dsCloud);
     }
 
     @Primary
-    @Bean(name = "inmedssEMFactory")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactoryInmedss(EntityManagerFactoryBuilder builder,
-                                                                              @Qualifier("dsInmedss") DataSource dsInmedss) {
-        return builder.dataSource(dsInmedss).properties(hibernateProperties()).packages("ec.marlonpluas.prueba.cloud.entity")
-                .persistenceUnit("dbInmedss").build();
+    @Bean(name = "cloudEMFactory")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactoryCloud(EntityManagerFactoryBuilder builder,
+                                                                            @Qualifier("dsCloud") DataSource dsCloud) {
+        return builder.dataSource(dsCloud).properties(hibernateProperties()).packages("ec.marlonpluas.prueba.cloud.entity")
+                .persistenceUnit("dbCloud").build();
     }
 
     @Primary
-    @Bean(name = "inmedssTM")
-    public PlatformTransactionManager transactionManagerInmedss(@Qualifier("inmedssEMFactory") EntityManagerFactory inmedssEMFactory) {
-        return new JpaTransactionManager(inmedssEMFactory);
+    @Bean(name = "cloudTM")
+    public PlatformTransactionManager transactionManagerCloud(@Qualifier("cloudEMFactory") EntityManagerFactory cloudEMFactory) {
+        return new JpaTransactionManager(cloudEMFactory);
     }
-    // FIN CONFIGURACIÓN INMEDSS
+    // FIN CONFIGURACIÓN CLOUD
 }

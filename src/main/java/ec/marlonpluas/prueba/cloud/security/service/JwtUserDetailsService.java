@@ -10,9 +10,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service JwtUserDetailsService
+ *
+ * @author Marlon Plúas
+ * @version 1.0.0
+ * @since 15/03/2021
+ */
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
-
     @Autowired
     private InfoUsuarioRepository infoUsuarioRepo;
 
@@ -20,7 +26,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         InfoUsuario user = infoUsuarioRepo.findOneByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found with username: " + username);
+            throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         }
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
                 new ArrayList<>());

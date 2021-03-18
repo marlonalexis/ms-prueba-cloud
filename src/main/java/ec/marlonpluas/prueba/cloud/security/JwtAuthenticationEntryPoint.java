@@ -10,9 +10,15 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
+/**
+ * EntryPoint Authentication
+ *
+ * @author Marlon Plúas
+ * @version 1.0.0
+ * @since 15/03/2021
+ */
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint, Serializable {
-
     private static final long serialVersionUID = -7858869558953243875L;
 
     @Override

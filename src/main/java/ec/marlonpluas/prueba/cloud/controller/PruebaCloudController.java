@@ -14,7 +14,9 @@ import ec.marlonpluas.prueba.cloud.service.PruebaCloudService;
 /**
  * Controller Prueba Cloud
  *
- * @author Marlon Pluas
+ * @author Marlon Plúas
+ * @version 1.0.0
+ * @since 15/03/2021
  */
 @RestController
 public class PruebaCloudController {
@@ -24,7 +26,7 @@ public class PruebaCloudController {
     PruebaCloudService pruebaCloudService;
 
     @PostMapping(path = "DevOps", consumes = "application/json")
-    public PruebaCloudResDTO DevOps(@RequestBody PruebaCloudReqDTO request) {
+    public PruebaCloudResDTO devOps(@RequestBody PruebaCloudReqDTO request) {
         log.info("Petición recibida: DevOps");
         PruebaCloudResDTO response = new PruebaCloudResDTO();
         response.setMessage(pruebaCloudService.prueba(request));
