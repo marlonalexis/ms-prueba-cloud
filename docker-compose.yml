@@ -4,12 +4,9 @@ services:
   cloud:
     image: $NOMBRE_IMAGEN
     ports:
-      - '8080:8080'
-    #volumes:
-    #  - "$PWD/application.properties:/application.properties"
-    #  - "$PWD/log4j2.xml:/log4j2.xml"
-    #  - "/home/Data/ms-admin-inmedss:/var/datos"
-    #  - "/home/FileServerPublico:/var/datosPublico"
-    #  - "/var/log/deploy/ms-admin-inmedss:/var/log/msa"
+      - '$PUERTO_EXT:$PUERTO_INT'
+    volumes:
+      - "$PWD/application.properties:/application.properties"
+      - "$PWD/log4j2.xml:/log4j2.xml"
     deploy:
       replicas: $REPLICAS

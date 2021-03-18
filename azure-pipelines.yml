@@ -154,9 +154,16 @@ stages:
               failOnStdErr: false
             continueOnError: true
           - task: SSH@0
-            displayName: Pull image
+            displayName: Pull image VM1
             inputs:
               sshEndpoint: marlonpluasvm1
+              commands: |
+                docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
+              failOnStdErr: false
+          - task: SSH@0
+            displayName: Pull image VM2
+            inputs:
+              sshEndpoint: marlonpluasvm2
               commands: |
                 docker pull $(hostDockerRegistry)/$(nombreImagen):$(tagImagen)
               failOnStdErr: false
