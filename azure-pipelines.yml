@@ -152,7 +152,7 @@ stages:
   - stage: Deploy_Test
     displayName: Stage Deploy Test
     dependsOn: Releases
-    condition: and(succeeded(), ne(variables.branch, 'main'))
+    condition: and(succeeded(), eq(variables.branch, 'main'))
     jobs:
       - job: Deploy
         displayName: Deploy job
@@ -200,12 +200,12 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                env PWD=$(pwd)/$(keySwarmDeployTest)_$(serviceSwarm) env PUERTO_INT=$(puertoInt) env PUERTO_EXT=$(puertoExt) env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeployTest)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeployTest)
+                env PWD=$(pwd)/$(keySwarmDeployTest)_$(serviceSwarm) env PUERTO_INT=$(puertoInt) env PUERTO_EXT=$(puertoExtTest) env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeployTest)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeployTest)
 
   - stage: Deploy_Prod
     displayName: Stage Deploy Prod
     dependsOn: Releases
-    condition: and(succeeded(), eq(variables.branch, 'main'))
+    condition: and(succeeded(), ne(variables.branch, 'main'))
     jobs:
       - job: Deploy
         displayName: Deploy job
