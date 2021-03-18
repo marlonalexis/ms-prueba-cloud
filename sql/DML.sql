@@ -1,3 +1,5 @@
+CREATE SCHEMA `pruebacloud` ;
+
 use pruebaCloud;
 
 CREATE USER 'pruebaCloud'@'%';

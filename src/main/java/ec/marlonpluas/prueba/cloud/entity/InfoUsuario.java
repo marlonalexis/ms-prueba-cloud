@@ -26,7 +26,7 @@ import lombok.Data;
  */
 @Data
 @Entity
-@Table(name = "info_usuario", schema = CoreUtilConstants.SCHEMA_PRUEBA_CLOUD)
+@Table(name = "info_usuario")
 public class InfoUsuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

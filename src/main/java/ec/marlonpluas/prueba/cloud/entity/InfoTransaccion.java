@@ -3,6 +3,7 @@ package ec.marlonpluas.prueba.cloud.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ec.marlonpluas.prueba.cloud.util.CoreUtilConstants;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -16,7 +17,7 @@ import java.util.Date;
  */
 @Data
 @Entity
-@Table(name = "info_transaccion", schema = CoreUtilConstants.SCHEMA_PRUEBA_CLOUD)
+@Table(name = "info_transaccion")
 public class InfoTransaccion {
     @Id
     @Column(name = "id_transaccion")
