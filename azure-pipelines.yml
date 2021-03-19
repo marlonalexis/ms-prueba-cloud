@@ -5,74 +5,24 @@ pool:
 
 variables:
   - template: variables-pipelines.yml
+  - ${{ if eq(variables['Build.SourceBranch'], 'main') }}:
+      - group: group-prod
+  - ${{ if ne(variables['Build.SourceBranch'], 'main') }}:
+      - group: group-test
 
 stages:
-  - stage: Development_Test
-    displayName: Stage Development and Test
-    jobs:
-      - job: Maven
-        displayName: Maven job
-        steps:
-          - task: Cache@2
-            inputs:
-              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
-          - task: Maven@3
-            displayName: Validate maven structure
-            inputs:
-              goals: validate
-              options: '-Dmaven.test.skip=true'
-              publishJUnitResults: false
-      - job: Test
-        displayName: Test job
-        dependsOn: Maven
-        steps:
-          - task: SonarCloudPrepare@1
-            displayName: Prepare analysis in SonarCloud
-            inputs:
-              SonarCloud: 'mpluasgu_ms-prueba-cloud'
-              organization: 'mpluasgu'
-              scannerMode: Other
-          - task: Cache@2
-            inputs:
-              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
-              restoreKeys: |
-                maven | "$(Agent.OS)"
-                maven
-              path: $(mavenCacheFolder)
-            displayName: Cache maven
-          - task: Maven@3
-            displayName: Unit tests
-            inputs:
-              goals: test
-              options: '-Dsonar.projectKey=$(sonarKeyProject)'
-              testResultsFiles: '**/TEST-*.xml'
-              codeCoverageToolOption: JaCoCo
-              codeCoverageRestoreOriginalPomXml: true
-              sonarQubeRunAnalysis: true
-              isJacocoCoverageReportXML: true
-          - task: SonarCloudPublish@1
-            displayName: Publish the results to the build summary
-            inputs:
-              pollingTimeoutSec: '300'
-          - task: PublishCodeCoverageResults@1
-            displayName: Publish code coverage
-            inputs:
-              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/jacoco.xml'
-              reportDirectory: '$(System.DefaultWorkingDirectory)/**/site/jacoco'
-              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/**/*.exec'
-
   - stage: Build
     displayName: Stage Build
-    dependsOn: Development_Test
+    #dependsOn: Development_Test
     jobs:
       - job: Download
         displayName: Download Repository job
         steps:
+          - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+            displayName: Replace tokens
+            inputs:
+              targetFiles: |
+                **/application.properties.dist
           - task: CopyFilesOverSSH@0
             displayName: Securely copy files to the remote machine prod
             condition: and(succeeded(), eq(variables.isMain, true))
@@ -289,7 +239,7 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm3
               commands: |
-                cp $(pwd)/$(keySwarmDeployTest)_$(serviceSwarm)/$(properties).test $(pwd)/$(keySwarmDeployTest)_$(serviceSwarm)/$(properties)
+                cp $(pwd)/$(keySwarmDeployTest)_$(serviceSwarm)/$(properties).dist $(pwd)/$(keySwarmDeployTest)_$(serviceSwarm)/$(properties)
                 env PWD=$(pwd)/$(keySwarmDeployTest)_$(serviceSwarm) env PUERTO_INT=$(puertoInt) env PUERTO_EXT=$(puertoExtTest) env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeployTest)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeployTest)
                 docker stack deploy -c $(pwd)/haproxy/docker-compose.yml sso
 
@@ -345,6 +295,6 @@ stages:
             inputs:
               sshEndpoint: marlonpluasvm1
               commands: |
-                cp $(pwd)/$(keySwarmDeploy)_$(serviceSwarm)/$(properties).prod $(pwd)/$(keySwarmDeploy)_$(serviceSwarm)/$(properties)
+                cp $(pwd)/$(keySwarmDeploy)_$(serviceSwarm)/$(properties).dist $(pwd)/$(keySwarmDeploy)_$(serviceSwarm)/$(properties)
                 env PWD=$(pwd)/$(keySwarmDeploy)_$(serviceSwarm) env PUERTO_INT=$(puertoInt) env PUERTO_EXT=$(puertoExt) env NOMBRE_IMAGEN=$(hostDockerRegistry)/$(nombreImagen):$(tagImagen) env REPLICAS=$(numReplicasSwarm) docker stack deploy -c $(keySwarmDeploy)_$(serviceSwarm)/docker-compose.yml $(keySwarmDeploy)
                 docker stack deploy -c $(pwd)/haproxy/docker-compose.yml sso
