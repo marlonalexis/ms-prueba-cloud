@@ -6,7 +6,7 @@ variables:
   serviceSwarm: cloud
   keySwarmDeploy: sso
   keySwarmDeployTest: sso_test
-  numReplicasSwarm: 2
+  numReplicasSwarm: 4
   sonarKeyProject: mpluasgu_ms-prueba-cloud
   properties: application.properties
   puertoInt: 8080

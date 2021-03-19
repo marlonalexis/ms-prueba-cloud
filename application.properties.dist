@@ -1,0 +1,21 @@
+#Port
+server.port=8080
+#Config
+correo.admin=#{correoAdmin}#
+user.admin=#{usrAdmin}#
+pass.admin=#{passAdmin}#
+#Seguridad
+jwt.secret=#{jwtSecret}#
+jwt.header.token=X-JWT-KWY
+jwt.header.apiKey=X-Parse-REST-API-Key
+jwt.apiKey.secret=#{apiKey}#
+#Base inmedss
+cloud.datasource.jdbcUrl=jdbc:mysql://#{hostMysql}#:3306/#{baseMysql}#?serverTimezone=UTC&createDatabaseIfNotExist=true&autoReconnect=true&useSSL=false
+cloud.datasource.username=#{usrMysql}#
+cloud.datasource.password=#{passMysql}#
+#Datos datasource generales
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.connection-timeout=60000
+spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.max-lifetime=600000
