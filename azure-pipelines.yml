@@ -11,9 +11,78 @@ variables:
       - group: group-test
 
 stages:
+  - stage: Check
+    displayName: Stage Check
+    jobs:
+      - job: Maven
+        displayName: Maven job
+        steps:
+          - task: Cache@2
+            inputs:
+              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(mavenCacheFolder)
+            displayName: Cache maven
+          - task: Maven@3
+            displayName: Validate maven structure
+            inputs:
+              goals: validate
+              options: '-Dmaven.test.skip=true'
+              publishJUnitResults: false
+
+  - stage: Test
+    displayName: Stage Test
+    dependsOn: Check
+    jobs:
+      - job: Test
+        displayName: Test job
+        steps:
+          - task: qetza.replacetokens.replacetokens-task.replacetokens@3
+            displayName: Replace tokens
+            inputs:
+              targetFiles: |
+                **/application.properties.dist
+          - script: cp $(System.DefaultWorkingDirectory)/$(properties).dist $(System.DefaultWorkingDirectory)/$(properties)
+          - task: SonarCloudPrepare@1
+            displayName: Prepare analysis in SonarCloud
+            inputs:
+              SonarCloud: 'mpluasgu_ms-prueba-cloud'
+              organization: 'mpluasgu'
+              scannerMode: Other
+          - task: Cache@2
+            inputs:
+              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(mavenCacheFolder)
+            displayName: Cache maven
+          - task: Maven@3
+            displayName: Unit tests
+            inputs:
+              goals: test
+              options: '-Dsonar.projectKey=$(sonarKeyProject)'
+              testResultsFiles: '**/TEST-*.xml'
+              codeCoverageToolOption: JaCoCo
+              codeCoverageRestoreOriginalPomXml: true
+              sonarQubeRunAnalysis: true
+              isJacocoCoverageReportXML: true
+          - task: SonarCloudPublish@1
+            displayName: Publish the results to the build summary
+            inputs:
+              pollingTimeoutSec: '300'
+          - task: PublishCodeCoverageResults@1
+            displayName: Publish code coverage
+            inputs:
+              summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/jacoco.xml'
+              reportDirectory: '$(System.DefaultWorkingDirectory)/**/site/jacoco'
+              additionalCodeCoverageFiles: '$(System.DefaultWorkingDirectory)/**/*.exec'
+
   - stage: Build
     displayName: Stage Build
-    #dependsOn: Development_Test
+    dependsOn: Test
     jobs:
       - job: Download
         displayName: Download Repository job
