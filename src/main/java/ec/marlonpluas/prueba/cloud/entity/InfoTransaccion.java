@@ -3,6 +3,7 @@ package ec.marlonpluas.prueba.cloud.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import ec.marlonpluas.prueba.cloud.util.CoreUtilConstants;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.persistence.*;
 import java.util.Date;
