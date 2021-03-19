@@ -1,7 +1,9 @@
 package ec.marlonpluas.prueba.cloud;
 
+import ec.marlonpluas.prueba.cloud.entity.AdmiApi;
 import ec.marlonpluas.prueba.cloud.entity.InfoUsuario;
 import ec.marlonpluas.prueba.cloud.enums.Estado;
+import ec.marlonpluas.prueba.cloud.repository.AdmiApiRepository;
 import ec.marlonpluas.prueba.cloud.repository.InfoUsuarioRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,11 +38,17 @@ public class MsPruebaCloudApplication implements CommandLineRunner {
     @Value("${pass.admin}")
     private String passAdmin;
 
+    @Value("${jwt.apiKey.secret}")
+    private String apiKeyAdmi;
+
     @Autowired
     private PasswordEncoder bcryptEncoder;
 
     @Autowired
     private InfoUsuarioRepository infoUsuarioRepo;
+
+    @Autowired
+    private AdmiApiRepository admiApiRepos;
 
     public static void main(String[] args) {
         SpringApplication.run(MsPruebaCloudApplication.class, args);
@@ -58,6 +66,14 @@ public class MsPruebaCloudApplication implements CommandLineRunner {
             admin.setEstado(Estado.Activo.toString());
             admin.setFeCreacion(new Date());
             infoUsuarioRepo.save(admin);
+        }
+        /* Creacion de apiKey */
+        if (!admiApiRepos.existsByValor(apiKeyAdmi)) {
+            log.info("Creando apiKey administrador xxxxxxxxxxxxxxxxxxxx");
+            AdmiApi api = new AdmiApi();
+            api.setValor(apiKeyAdmi);
+            api.setEstado(Estado.Activo.toString());
+            admiApiRepos.save(api);
         }
     }
 }

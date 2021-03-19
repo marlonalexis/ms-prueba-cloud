@@ -13,7 +13,7 @@ stages:
         steps:
           - task: Cache@2
             inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
               restoreKeys: |
                 maven | "$(Agent.OS)"
                 maven
@@ -37,7 +37,7 @@ stages:
               scannerMode: Other
           - task: Cache@2
             inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
               restoreKeys: |
                 maven | "$(Agent.OS)"
                 maven
@@ -125,7 +125,7 @@ stages:
             displayName: Initializing variables
           - task: Cache@2
             inputs:
-              key: 'maven | "$(Agent.OS)" | **/pom.xml'
+              key: '"funcs" | maven |"$(Agent.OS)" | **/pom.xml'
               restoreKeys: |
                 maven | "$(Agent.OS)"
                 maven
@@ -279,6 +279,8 @@ stages:
               sshEndpoint: marlonpluasvm3
               commands: |
                 docker service rm $(keySwarmDeployTest)_$(serviceSwarm)
+                docker service rm sso_haproxy
+                docker stack deploy -c $(pwd)/haproxy/docker-compose.yml sso
               failOnStdErr: false
             continueOnError: true
           - task: SSH@0
@@ -333,6 +335,8 @@ stages:
               sshEndpoint: marlonpluasvm1
               commands: |
                 docker service rm $(keySwarmDeploy)_$(serviceSwarm)
+                docker service rm sso_haproxy
+                docker stack deploy -c $(pwd)/haproxy/docker-compose.yml sso
               failOnStdErr: false
             continueOnError: true
           - task: SSH@0

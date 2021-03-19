@@ -33,6 +33,12 @@ CREATE TABLE `info_transaccion` (
                                                   `username` VARCHAR(500) NOT NULL,
                                                   `estado` VARCHAR(45) NOT NULL,
                                                   `fe_creacion` DATETIME NOT NULL,
-                                                  `usr_modificacion` VARCHAR(45) NOT NULL,
+                                                  `usr_modificacion` VARCHAR(45) NULL,
                                                   `fe_modificacion` DATETIME NULL,
                                                   PRIMARY KEY (`id_transaccion`));
+
+CREATE TABLE `admi_api` (
+                                    `id_api` int(11) NOT NULL AUTO_INCREMENT,
+                                    `valor` VARCHAR(500) NOT NULL,
+                                    `estado` VARCHAR(45) NOT NULL,
+                                    PRIMARY KEY (`id_api`));
