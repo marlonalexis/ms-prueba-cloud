@@ -11,6 +11,8 @@ import ec.marlonpluas.prueba.cloud.security.JwtTokenUtil;
 import ec.marlonpluas.prueba.cloud.security.dto.JwtRequest;
 import ec.marlonpluas.prueba.cloud.security.dto.JwtResponse;
 import ec.marlonpluas.prueba.cloud.security.service.JwtUserDetailsService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class JwtAuthenticationController {
+    Logger log = LogManager.getLogger(this.getClass());
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -46,7 +50,8 @@ public class JwtAuthenticationController {
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
+    public ResponseEntity<?> login(@RequestBody JwtRequest authenticationRequest) throws Exception {
+        log.info("Petición recibida: login");
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());

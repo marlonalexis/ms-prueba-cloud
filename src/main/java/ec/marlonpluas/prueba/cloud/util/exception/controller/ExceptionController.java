@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.sasl.AuthenticationException;
+
 /**
  * Clase genérica que orquesta las excepciones
  *
@@ -32,7 +34,7 @@ public class ExceptionController {
      * @version 1.0
      * @since 02/03/2020
      */
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(value = {Exception.class, AuthenticationException.class, IllegalArgumentException.class})
     public ResponseEntity<String> handleException(Exception e) {
         log.error("Error generado: " + e.getMessage());
         return new ResponseEntity<>(CoreUtilConstants.MENSAJE_ERROR, HttpStatus.BAD_REQUEST);
